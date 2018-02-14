@@ -1,0 +1,15 @@
+{
+  "name": "linechart",
+  "version": "1.0.0",
+  "description": "D3 Line Chart",
+  "main": "index.js",
+  "dependencies": {
+    "node-static": "^0.7.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Svitlana Pylypenko",
+  "license": "ISC"
+}
