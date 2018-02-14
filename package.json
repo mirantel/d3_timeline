@@ -1,0 +1,18 @@
+{
+  "name": "D3 Chart",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/npm/npm.git"
+  },
+  "description": "Node.js package manager config",
+  "devDependencies": {
+    "del": "^1.2.1",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-connect": "^5.0.0",
+    "open": "0.0.5",
+    "require-dir": "^0.3.0",
+    "run-sequence": "^1.2.2"
+  }
+}
