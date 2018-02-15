@@ -8,7 +8,6 @@ var svg = d3.select("svg"),
 
 // Parse the date / time
 var parseDate = d3.timeParse("%d-%b-%y");
-var formatPercent = d3.format("100%");
 
 // Set the ranges
 var x = d3.scaleTime().range([0, width]),
@@ -19,7 +18,9 @@ var x = d3.scaleTime().range([0, width]),
 // Define the axes
 var xAxis = d3.axisBottom(x),
     xAxis2 = d3.axisBottom(x2),
-    yAxis = d3.axisLeft(y).tickFormat(formatPercent);
+    yAxis = d3.axisLeft(y)
+      .tickArguments(10)
+      .tickFormat(function(d) { return d + "%"; });
 
 // Define the brush
 var brush = d3.brushX()
@@ -49,7 +50,8 @@ svg.append("defs").append("clipPath")
     .attr("id", "clip")
   .append("rect")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height + 8) // 8 - for dots
+    .attr("transform", "translate( 0, -4 )"); // -4 - for dots
 
 var focus = svg.append("g")
     .attr("class", "focus")
@@ -65,7 +67,7 @@ d3.csv("sp500.csv", type, function(error, data) {
 
   // Scale the range of the data
   x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([0, d3.max(data, function(d) { return d.price; })]);
+  y.domain([0, 100]);
   x2.domain(x.domain());
   y2.domain(y.domain());
 
@@ -81,7 +83,7 @@ d3.csv("sp500.csv", type, function(error, data) {
       .selectAll("dot")
       .data(data)
     .enter().append("circle")
-      .attr("r", 4)
+      .attr("r", 3)
       .attr('class', 'dot')
       .attr("cx", function(d) { return x(d.date); })
       .attr("cy", function(d) { return y(d.price); });
@@ -125,6 +127,7 @@ function brushed() {
   x.domain(s.map(x2.invert, x2));
   focus.select(".area").attr("d", area);
   focus.select(".axis--x").call(xAxis);
+  focus.selectAll(".dot").attr("cx", function(d) { return x(d.date); });
   svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
       .scale(width / (s[1] - s[0]))
       .translate(-s[0], 0));
@@ -136,6 +139,7 @@ function zoomed() {
   x.domain(t.rescaleX(x2).domain());
   focus.select(".area").attr("d", area);
   focus.select(".axis--x").call(xAxis);
+  focus.selectAll(".dot").attr("cx", function(d) { return x(d.date); });
   context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 }
 
