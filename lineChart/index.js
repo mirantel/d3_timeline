@@ -16,9 +16,11 @@ var x = d3.scaleTime().range([0, width]),
     y2 = d3.scaleLinear().range([height2, 0]);
 
 // Define the axes
-var xAxis = d3.axisBottom(x),
+var xAxis = d3.axisBottom(x)
+      .tickSize(-height),
     xAxis2 = d3.axisBottom(x2),
     yAxis = d3.axisLeft(y)
+      .tickSize(-width)
       .tickArguments(10)
       .tickFormat(function(d) { return d + "%"; });
 
@@ -50,8 +52,8 @@ svg.append("defs").append("clipPath")
     .attr("id", "clip")
   .append("rect")
     .attr("width", width)
-    .attr("height", height + 8) // 8 - for dots
-    .attr("transform", "translate( 0, -4 )"); // -4 - for dots
+    .attr("height", height + 10) // 10 - for dots
+    .attr("transform", "translate( 0, -5 )"); // -5  - for dots
 
 var focus = svg.append("g")
     .attr("class", "focus")
@@ -77,6 +79,15 @@ d3.csv("sp500.csv", type, function(error, data) {
       .attr("class", "area")
       .attr("d", area);
 
+  focus.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  focus.append("g")
+      .attr("class", "axis axis--y")
+      .call(yAxis);
+
   // Add the scatterplot
   focus.append("g")
       .attr('class', 'dots')
@@ -87,15 +98,6 @@ d3.csv("sp500.csv", type, function(error, data) {
       .attr('class', 'dot')
       .attr("cx", function(d) { return x(d.date); })
       .attr("cy", function(d) { return y(d.price); });
-
-  focus.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  focus.append("g")
-      .attr("class", "axis axis--y")
-      .call(yAxis);
 
   context.append("path")
       .datum(data)
