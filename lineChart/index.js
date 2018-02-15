@@ -4,7 +4,7 @@ var svg = d3.select("svg"),
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var parseTime = d3.timeParse("%d-%b-%y");
+var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
 
 var x = d3.scaleTime()
     .rangeRound([0, width]);
@@ -13,7 +13,7 @@ var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
 
-var myDate = ["24-Apr-07","25-Apr-07","26-Apr-07"];
+var myDate = ["2018-01-29T13:07:15.038Z","2018-02-07T11:16:35.002Z","2018-02-07T11:19:40.537Z"];
 var myValue = [100, 200, 90];
 
 var myData = [];
