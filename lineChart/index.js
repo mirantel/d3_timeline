@@ -48,6 +48,17 @@ var area2 = d3.area()
     .y0(height2)
     .y1(function(d) { return y2(d.price); });
 
+
+    var tip = d3.tip()
+      .attr("class", "d3-tip")
+      .offset([-8, 0])
+      .html(function(d) {
+         return "Scrore: " + d.price + "%<br>" +
+                "Date:" + d.date + "<br>" +
+                "Scored by Name";
+       });
+    svg.call(tip);
+
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
   .append("rect")
@@ -97,7 +108,9 @@ d3.csv("sp500.csv", type, function(error, data) {
       .attr("r", 3)
       .attr('class', 'dot')
       .attr("cx", function(d) { return x(d.date); })
-      .attr("cy", function(d) { return y(d.price); });
+      .attr("cy", function(d) { return y(d.price); })
+      .on("mouseover", tip.show)
+      .on("mouseout", tip.hide);
 
   context.append("path")
       .datum(data)
