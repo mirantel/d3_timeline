@@ -6,6 +6,26 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Line Chart</title>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    .area {
+      fill: rgba(0, 162, 237, .4);
+      stroke: #008cc7;
+      stroke-width: 2px;
+      clip-path: url(#clip);
+    }
+
+    .zoom {
+      cursor: move;
+      fill: none;
+      pointer-events: all;
+    }
+
+    .dot {
+      stroke: #008cc7;
+      stroke-width: 2px;
+      fill: #fff;
+    }
+</style>
 </head>
 <body>
   <svg width="960" height="500"></svg>
