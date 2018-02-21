@@ -7,8 +7,12 @@
   <title>Line Chart</title>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="jquery-3.3.1.min.js"></script>
-  <script src="d3-tip.js"></script>
   <style>
+    *, *:before, *:after {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
     .area {
       fill: rgba(0, 162, 237, .4);
       stroke: #008cc7;
@@ -29,8 +33,7 @@
     }
 
     .dot:hover {
-      stroke-width: 2px;
-      r: 4;
+      r: 5;
     }
 
     .dots {
@@ -51,6 +54,7 @@
     .selection {
       stroke-width: 0;
     }
+
     .axisLine {
       fill: none;
       shape-rendering: crispEdges;
@@ -58,27 +62,8 @@
       stroke-width: 2px;
     }
 
-    .d3-tip {
-      line-height: 1;
-      font-weight: bold;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.8);
-      color: #fff;
-      border-radius: 2px;
-    }
-
     /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-      box-sizing: border-box;
-      display: inline;
-      font-size: 10px;
-      width: 100%;
-      line-height: 1;
-      color: rgba(0, 0, 0, 0.8);
-      content: "\25BC";
-      position: absolute;
-      text-align: center;
-    }
+
 
     /* Style northward tooltips differently */
     .d3-tip.n:after {
@@ -87,16 +72,46 @@
       left: 0;
     }
 
+    .tooltip {
+      position: absolute;
+      min-height: 20px;
+      min-width: 30px;
+      padding: 6px;
+      font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      font-size: 12px;
+      line-height: 14px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border-radius: 5px;
+      pointer-events: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .tooltip:before {
+      border: 5px solid transparent;
+      display: block;
+      border-right-color: rgba(0, 0, 0, 0.8);
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -10px;
+      margin-top: -5px;
+    }
+
+    .tooltip--right:before {
+      left: auto;
+      right: -10px;
+      border-color: transparent transparent transparent rgba(0, 0, 0, 0.8);
+    }
+
     #chart,
     #chart2 {
       height: 600px;
+      position: relative;
     }
 </style>
 </head>
 <body>
-  <!-- <div class="graph-wrapper">
-    <svg id="graph_d3" height="500"></svg>
-  </div> -->
   <div id="chart"></div>
   <div id="chart2"></div>
   <script src="data.js"></script>

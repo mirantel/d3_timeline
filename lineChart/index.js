@@ -12,6 +12,11 @@ function createChart(divID, rubyData) {
     .attr("width", wrapperWidth)
     .attr("height", wrapperHeight);
 
+  // Define the div for the tooltip
+  var tooltip = d3.select(chartWrapper).append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
   // Set the dimensions of the canvas / graph
   var margin = {top: 20, right: 20, bottom: 110, left: 40},
       margin2 = {top: (wrapperHeight-75), right: 20, bottom: 30, left: 40},
@@ -70,16 +75,6 @@ function createChart(divID, rubyData) {
       .y0(height2)
       .y1(function(d) { return y2(d.score); });
 
-  var tip = d3.tip()
-    .attr("class", "d3-tip")
-    .offset([-8, 0])
-    .html(function(d) {
-       return "<b>Scrore: </b>" + d.score + "%<br>" +
-              "<b>Date: </b>" + d.date + "<br>" +
-              "<b>Scored by: </b>" + d.createdBy;
-     });
-  chart.call(tip);
-
   chart.append("defs").append("clipPath")
       .attr("id", "clip")
     .append("rect")
@@ -129,12 +124,52 @@ function createChart(divID, rubyData) {
         .selectAll("dot")
         .data(data)
       .enter().append("circle")
-        .attr("r", 3)
+        .attr("r", 4)
         .attr('class', 'dot')
-        .attr("cx", function(d) { return x(d.date); })
-        .attr("cy", function(d) { return y(d.score); })
-        .on("mouseover", tip.show)
-        .on("mouseout", tip.hide);
+        .attr("cx", function(d) {
+          // console.log('x = ' + x(d.date));
+          return x(d.date);
+        })
+        .attr("cy", function(d) {
+          // console.log('y = ' + y(d.score));
+          return y(d.score);
+        })
+        .on("mouseover", function(d) {
+            var tooltipX = +d3.select(this).attr("cx") + margin.left + 10;
+            var tooltipY = +d3.select(this).attr("cy") + margin.top;
+            var tooltipWidth = tooltip.node().offsetWidth;
+            var tooltipHeight = tooltip.node().offsetHeight;
+            var tooltipMargin = -1 * tooltipHeight / 2 + "px 0 0 0";
+
+            if (tooltipX > width/2) {
+              tooltipX = tooltipX - tooltipWidth - 20;
+              tooltip.classed("tooltip--right", true);
+            }
+            else {
+              tooltip.classed("tooltip--right", false);
+            }
+
+            tooltip
+              .style("left", tooltipX + "px")
+              .style("top", tooltipY + "px")
+              .style("margin", tooltipMargin)
+              .transition()
+              .duration(300)
+              .style("opacity", 1);
+
+            tooltip.html(function() {
+               return "<b>Scrore: </b>" + d.score + "%<br>" +
+                       "<b>Date: </b>" + d.date + "<br>" +
+                       "<b>Scored by: </b>" + d.createdBy;
+
+             });
+
+            })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
     context.append("path")
         .datum(data)
