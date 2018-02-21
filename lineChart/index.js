@@ -14,7 +14,7 @@ function createChart(divID, rubyData) {
 
   // Define the div for the tooltip
   var tooltip = d3.select(chartWrapper).append("div")
-      .attr("class", "tooltip")
+      .attr("class", "d3-tooltip")
       .style("opacity", 0);
 
   // Set the dimensions of the canvas / graph
@@ -126,14 +126,8 @@ function createChart(divID, rubyData) {
       .enter().append("circle")
         .attr("r", 4)
         .attr('class', 'dot')
-        .attr("cx", function(d) {
-          // console.log('x = ' + x(d.date));
-          return x(d.date);
-        })
-        .attr("cy", function(d) {
-          // console.log('y = ' + y(d.score));
-          return y(d.score);
-        })
+        .attr("cx", function(d) { return x(d.date); })
+        .attr("cy", function(d) { return y(d.score); })
         .on("mouseover", function(d) {
             var tooltipX = +d3.select(this).attr("cx") + margin.left + 10;
             var tooltipY = +d3.select(this).attr("cy") + margin.top;
@@ -143,10 +137,10 @@ function createChart(divID, rubyData) {
 
             if (tooltipX > width/2) {
               tooltipX = tooltipX - tooltipWidth - 20;
-              tooltip.classed("tooltip--right", true);
+              tooltip.classed("d3-tooltip--right", true);
             }
             else {
-              tooltip.classed("tooltip--right", false);
+              tooltip.classed("d3-tooltip--right", false);
             }
 
             tooltip
@@ -161,14 +155,12 @@ function createChart(divID, rubyData) {
                return "<b>Scrore: </b>" + d.score + "%<br>" +
                        "<b>Date: </b>" + d.date + "<br>" +
                        "<b>Scored by: </b>" + d.createdBy;
-
              });
-
             })
         .on("mouseout", function(d) {
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
         });
 
     context.append("path")
