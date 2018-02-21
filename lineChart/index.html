@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Line Chart</title>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="jquery-3.3.1.min.js"></script>
   <script src="d3-tip.js"></script>
   <style>
     .area {
@@ -50,6 +51,13 @@
     .selection {
       stroke-width: 0;
     }
+    .axisLine {
+      fill: none;
+      shape-rendering: crispEdges;
+      stroke: rgba(0, 0, 0, 0.5);
+      stroke-width: 2px;
+    }
+
     .d3-tip {
       line-height: 1;
       font-weight: bold;
@@ -78,10 +86,19 @@
       top: 100%;
       left: 0;
     }
+
+    #chart {
+      background: #ccc;
+      height: 500px;
+    }
 </style>
 </head>
 <body>
-  <svg width="960" height="500"></svg>
+  <!-- <div class="graph-wrapper">
+    <svg id="graph_d3" height="500"></svg>
+  </div> -->
+  <div id="chart"></div>
+  <script src="data.js"></script>
   <script src="index.js"></script>
 </body>
 </html>

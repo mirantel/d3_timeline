@@ -1,13 +1,25 @@
+// Graph Data
+// var rubyData = <%= data.to_json.html_safe %>;
+
+var chartWrapper = document.getElementById("chart");
+var chart = d3.select(chartWrapper).append("svg");
+
+var wrapperWidth = chartWrapper.clientWidth;
+var wrapperHeight = chartWrapper.clientHeight;
+
+chart
+  .attr("width", wrapperWidth)
+  .attr("height", wrapperHeight);
+
 // Set the dimensions of the canvas / graph
-var svg = d3.select("svg"),
-    margin = {top: 20, right: 20, bottom: 110, left: 40},
+var margin = {top: 20, right: 20, bottom: 110, left: 40},
     margin2 = {top: 430, right: 20, bottom: 30, left: 40},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    height2 = +svg.attr("height") - margin2.top - margin2.bottom;
+    width = +chart.attr("width") - margin.left - margin.right,
+    height = +chart.attr("height") - margin.top - margin.bottom,
+    height2 = +chart.attr("height") - margin2.top - margin2.bottom;
 
 // Parse the date / time
-var parseDate = d3.timeParse("%d-%b-%y");
+var parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
 
 // Set the ranges
 var x = d3.scaleTime().range([0, width]),
@@ -40,44 +52,51 @@ var area = d3.area()
     .curve(d3.curveLinear)
     .x(function(d) { return x(d.date); })
     .y0(height)
-    .y1(function(d) { return y(d.price); });
+    .y1(function(d) { return y(d.score); });
 
 var area2 = d3.area()
     .curve(d3.curveLinear)
     .x(function(d) { return x2(d.date); })
     .y0(height2)
-    .y1(function(d) { return y2(d.price); });
+    .y1(function(d) { return y2(d.score); });
 
+var tip = d3.tip()
+  .attr("class", "d3-tip")
+  .offset([-8, 0])
+  .html(function(d) {
+     return "<b>Scrore: </b>" + d.score + "%<br>" +
+            "<b>Date: </b>" + d.date + "<br>" +
+            "<b>Scored by: </b>" + d.createdBy;
+   });
+chart.call(tip);
 
-    var tip = d3.tip()
-      .attr("class", "d3-tip")
-      .offset([-8, 0])
-      .html(function(d) {
-         return "Scrore: " + d.price + "%<br>" +
-                "Date:" + d.date + "<br>" +
-                "Scored by Name";
-       });
-    svg.call(tip);
-
-svg.append("defs").append("clipPath")
+chart.append("defs").append("clipPath")
     .attr("id", "clip")
   .append("rect")
     .attr("width", width)
     .attr("height", height + 10) // 10 - for dots
     .attr("transform", "translate( 0, -5 )"); // -5  - for dots
 
-var focus = svg.append("g")
+var focus = chart.append("g")
     .attr("class", "focus")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var context = svg.append("g")
+var context = chart.append("g")
     .attr("class", "context")
     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-// Get the data
-d3.csv("sp500.csv", type, function(error, data) {
-  if (error) throw error;
 
+var data = [];
+rubyData.forEach(function(item, index) {
+  return data.push({
+    date: parseDate(item.date),
+    score: item.score,
+    createdBy: item.created_by
+  })
+});
+console.log(data);
+
+  if (data) {
   // Scale the range of the data
   x.domain(d3.extent(data, function(d) { return d.date; }));
   y.domain([0, 100]);
@@ -108,7 +127,7 @@ d3.csv("sp500.csv", type, function(error, data) {
       .attr("r", 3)
       .attr('class', 'dot')
       .attr("cx", function(d) { return x(d.date); })
-      .attr("cy", function(d) { return y(d.price); })
+      .attr("cy", function(d) { return y(d.score); })
       .on("mouseover", tip.show)
       .on("mouseout", tip.hide);
 
@@ -127,14 +146,13 @@ d3.csv("sp500.csv", type, function(error, data) {
       .call(brush)
       .call(brush.move, x.range());
 
-  svg.append("rect")
+  chart.append("rect")
       .attr("class", "zoom")
       .attr("width", width)
       .attr("height", height)
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
       .call(zoom);
-
-});
+}
 
 function brushed() {
   if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
@@ -143,7 +161,7 @@ function brushed() {
   focus.select(".area").attr("d", area);
   focus.select(".axis--x").call(xAxis);
   focus.selectAll(".dot").attr("cx", function(d) { return x(d.date); });
-  svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+  chart.select(".zoom").call(zoom.transform, d3.zoomIdentity
       .scale(width / (s[1] - s[0]))
       .translate(-s[0], 0));
 }
@@ -156,10 +174,4 @@ function zoomed() {
   focus.select(".axis--x").call(xAxis);
   focus.selectAll(".dot").attr("cx", function(d) { return x(d.date); });
   context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
-}
-
-function type(d) {
-  d.date = parseDate(d.date);
-  d.price = +d.price;
-  return d;
 }
