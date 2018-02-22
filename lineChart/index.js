@@ -1,7 +1,7 @@
 // Graph Data
-// var rubyData = <%= data.to_json.html_safe %>;
+// var sourceData = <%= data.to_json.html_safe %>;
 
-function createChart(divID, rubyData) {
+function createChart(divID, sourceData) {
   // Find element and append SVG
   var chartWrapper = document.getElementById(divID);
   var chart = d3.select(chartWrapper).append("svg");
@@ -28,7 +28,7 @@ function createChart(divID, rubyData) {
   var parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
 
   var data = [];
-  rubyData.forEach(function(item, index) {
+  sourceData.forEach(function(item, index) {
     return data.push({
       date: parseDate(item.date),
       score: item.score,
@@ -107,7 +107,7 @@ function createChart(divID, rubyData) {
     // Add focus (top) path
     focus.append("path")
         .datum(data)
-        .attr("class", "area")
+        .attr("class", showArea ? "area" : "aria--hidden")
         .attr("d", area);
 
     focus.append("path")
@@ -177,7 +177,7 @@ function createChart(divID, rubyData) {
 
     context.append("path")
         .datum(data)
-        .attr("class", "area")
+        .attr("class", showArea ? "area" : "aria--hidden")
         .attr("d", area2);
 
     context.append("path")
@@ -220,12 +220,21 @@ function createChart(divID, rubyData) {
 }
 
 createChart (
-  'chart',
-  myRubyData,
+  divID = 'chart',
+  sourceData = myRubyData,
   tooltipContent = function (tooltipScore, tooltipDate, tooltipCreatedBy) {
     return "<b>Scrore: </b>" + tooltipScore + "%<br>" +
       "<b>Date: </b>" + tooltipDate + "<br>" +
-      "<b>Scored by: </b>" + tooltipCreatedBy
-  }
+      "<b>Scored by: </b>" + tooltipCreatedBy;
+  },
+  showArea = false
 );
-createChart('chart2', myRubyData2);
+
+createChart (
+  divID = 'chart2',
+  sourceData = myRubyData2,
+  tooltipContent = function (tooltipScore, tooltipDate, tooltipCreatedBy) {
+    return "<b>Scrore: </b>" + tooltipScore + "%<br>";
+  },
+  showArea = true
+);
