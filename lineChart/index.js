@@ -1,7 +1,7 @@
 // Graph Data
 // var sourceData = <%= data.to_json.html_safe %>;
 
-function createChart(divID, sourceData) {
+function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yAxisTicksNum, yAxisTickFormat) {
   // Find element and append SVG
   var chartWrapper = document.getElementById(divID);
   var chart = d3.select(chartWrapper).append("svg");
@@ -36,6 +36,13 @@ function createChart(divID, sourceData) {
     })
   });
 
+  if (data.length == 1) {
+    data.unshift({
+      "date": new Date(data[0].date.getFullYear(), data[0].date.getMonth(), data[0].date.getDate()-1),
+      "score": yAxisValue[0],
+    })
+  }
+
   // Set the ranges
   var x = d3.scaleTime().range([0, width]),
       x2 = d3.scaleTime().range([0, width]),
@@ -48,8 +55,8 @@ function createChart(divID, sourceData) {
       xAxis2 = d3.axisBottom(x2),
       yAxis = d3.axisLeft(y)
         .tickSize(-width)
-        .tickArguments(10)
-        .tickFormat(function(d) { return d + "%"; });
+        .ticks(yAxisTicksNum)
+        .tickFormat(function(d) { return d + yAxisTickFormat; });
 
   // Define the brush
   var brush = d3.brushX()
@@ -100,7 +107,7 @@ function createChart(divID, sourceData) {
 
     // Scale the range of the data
     x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, 100]);
+    y.domain(yAxisValue);
     x2.domain(x.domain());
     y2.domain(y.domain());
 
@@ -196,6 +203,16 @@ function createChart(divID, sourceData) {
         .call(brush)
         .call(brush.move, x.range());
 
+  function render() {
+    console.log('Render!');
+  }
+
+  function resize() {
+    console.log('Resize!');
+
+    render();
+  }
+
   function brushed() {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
     var s = d3.event.selection || x2.range();
@@ -219,6 +236,9 @@ function createChart(divID, sourceData) {
     focus.selectAll(".dot").attr("cx", function(d) { return x(d.date); });
     context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
   }
+
+  d3.select(window).on("resize", resize);
+  render();
 }
 
 createChart (
@@ -229,14 +249,20 @@ createChart (
       "<b>Date: </b>" + tooltipDate + "<br>" +
       "<b>Scored by: </b>" + tooltipCreatedBy;
   },
-  showArea = false
+  showArea = true,
+  yAxisValue = [0, 100],
+  yAxisTicksNum = 10,
+  yAxisTickFormat ="%"
 );
 
 createChart (
   divID = 'chart2',
   sourceData = myRubyData2,
-  tooltipContent = function (tooltipScore, tooltipDate, tooltipCreatedBy) {
-    return "<b>Scrore: </b>" + tooltipScore + "%<br>";
+  tooltipContent = function (tooltipScore) {
+    return "<b>Num: </b>" + tooltipScore + "<br>";
   },
-  showArea = true
+  showArea = true,
+  yAxisValue = [1, 4],
+  yAxisTicksNum = 4,
+  yAxisTickFormat =""
 );
