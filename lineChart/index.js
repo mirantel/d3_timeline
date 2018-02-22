@@ -75,6 +75,14 @@ function createChart(divID, rubyData) {
       .y0(height2)
       .y1(function(d) { return y2(d.score); });
 
+  var line = d3.line()
+      .x(function(d) { return x(d.date); })
+      .y(function(d) { return y(d.score); });
+
+  var line2 = d3.line()
+      .x(function(d) { return x2(d.date); })
+      .y(function(d) { return y2(d.score); });
+
   chart.append("defs").append("clipPath")
       .attr("id", "clip")
     .append("rect")
@@ -101,6 +109,12 @@ function createChart(divID, rubyData) {
         .datum(data)
         .attr("class", "area")
         .attr("d", area);
+
+    focus.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("class", "line")
+        .attr("d", line);
 
     focus.append("g")
         .attr("class", "axis axis--x")
@@ -165,6 +179,12 @@ function createChart(divID, rubyData) {
         .datum(data)
         .attr("class", "area")
         .attr("d", area2);
+
+    context.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("class", "line")
+        .attr("d", line2);
 
     context.append("g")
         .attr("class", "axis axis--x")
