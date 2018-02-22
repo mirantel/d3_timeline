@@ -202,6 +202,7 @@ function createChart(divID, sourceData) {
     x.domain(s.map(x2.invert, x2));
     focus.select(".area").attr("d", area);
     focus.select(".axis--x").call(xAxis);
+    focus.select(".line").attr("d", line);
     focus.selectAll(".dot").attr("cx", function(d) { return x(d.date); });
     chart.select(".zoom").call(zoom.transform, d3.zoomIdentity
         .scale(width / (s[1] - s[0]))
@@ -214,6 +215,7 @@ function createChart(divID, sourceData) {
     x.domain(t.rescaleX(x2).domain());
     focus.select(".area").attr("d", area);
     focus.select(".axis--x").call(xAxis);
+    focus.select(".line").attr("d", line);
     focus.selectAll(".dot").attr("cx", function(d) { return x(d.date); });
     context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
   }
