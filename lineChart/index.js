@@ -129,34 +129,32 @@ function createChart(divID, rubyData) {
         .attr("cx", function(d) { return x(d.date); })
         .attr("cy", function(d) { return y(d.score); })
         .on("mouseover", function(d) {
-            var tooltipX = +d3.select(this).attr("cx") + margin.left + 10;
-            var tooltipY = +d3.select(this).attr("cy") + margin.top;
-            var tooltipWidth = tooltip.node().offsetWidth;
-            var tooltipHeight = tooltip.node().offsetHeight;
-            var tooltipMargin = -1 * tooltipHeight / 2 + "px 0 0 0";
+          tooltip.html(function() {
+            return tooltipContent(d.score, d.date, d.createdBy);
+          });
 
-            if (tooltipX > width/2) {
-              tooltipX = tooltipX - tooltipWidth - 20;
-              tooltip.classed("d3-tooltip--right", true);
-            }
-            else {
-              tooltip.classed("d3-tooltip--right", false);
-            }
+          var tooltipX = +x(d.date) + margin.left + 10;
+          var tooltipY = +y(d.score) + margin.top;
+          var tooltipWidth = tooltip.node().offsetWidth;
+          var tooltipHeight = tooltip.node().offsetHeight;
+          var tooltipMargin = -1 * tooltipHeight / 2 + "px 0 0 0";
 
-            tooltip
-              .style("left", tooltipX + "px")
-              .style("top", tooltipY + "px")
-              .style("margin", tooltipMargin)
-              .transition()
-              .duration(300)
-              .style("opacity", 1);
+          if (tooltipX > width/2) {
+            tooltipX = tooltipX - tooltipWidth - 20;
+            tooltip.classed("d3-tooltip--right", true);
+          }
+          else {
+            tooltip.classed("d3-tooltip--right", false);
+          }
 
-            tooltip.html(function() {
-               return "<b>Scrore: </b>" + d.score + "%<br>" +
-                       "<b>Date: </b>" + d.date + "<br>" +
-                       "<b>Scored by: </b>" + d.createdBy;
-             });
-            })
+          tooltip
+            .style("left", tooltipX + "px")
+            .style("top", tooltipY + "px")
+            .style("margin", tooltipMargin)
+            .transition()
+            .duration(300)
+            .style("opacity", 1);
+        })
         .on("mouseout", function(d) {
           tooltip.transition()
             .duration(500)
@@ -201,5 +199,13 @@ function createChart(divID, rubyData) {
   }
 }
 
-createChart('chart', myRubyData);
+createChart (
+  'chart',
+  myRubyData,
+  tooltipContent = function (tooltipScore, tooltipDate, tooltipCreatedBy) {
+    return "<b>Scrore: </b>" + tooltipScore + "%<br>" +
+      "<b>Date: </b>" + tooltipDate + "<br>" +
+      "<b>Scored by: </b>" + tooltipCreatedBy
+  }
+);
 createChart('chart2', myRubyData2);
