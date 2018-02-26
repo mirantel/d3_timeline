@@ -1,11 +1,12 @@
 {
-  "name": "D3 Chart",
+  "name": "Learn D3 Chart",
   "version": "0.1.0",
+  "description": "Node.js package manager config",
+  "main": "gulpfile.js",
   "repository": {
     "type": "git",
     "url": "http://github.com/npm/npm.git"
   },
-  "description": "Node.js package manager config",
   "devDependencies": {
     "del": "^1.2.1",
     "gulp": "^3.9.1",
@@ -14,5 +15,16 @@
     "open": "0.0.5",
     "require-dir": "^0.3.0",
     "run-sequence": "^1.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Svitalana Pylypenko",
+  "license": "MIT",
+  "dependencies": {
+    "eslint": "^4.18.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0"
   }
 }
