@@ -1,9 +1,8 @@
 // Graph Data
 // var sourceData = <%= data.to_json.html_safe %>;
 
-function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yAxisTicksNum, yAxisTickFormat) {
-  // Find element and append SVG
-  var chartWrapper = document.getElementById(divID);
+function createChart(chartWrapper, config) {
+  // Append SVG to the wrapper
   var chart = d3.select(chartWrapper).append("svg");
   var wrapperWidth = chartWrapper.clientWidth;
   var wrapperHeight = chartWrapper.clientHeight;
@@ -11,6 +10,9 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
   chart
     .attr("width", wrapperWidth)
     .attr("height", wrapperHeight);
+
+  d3.select(chartWrapper)
+    .style("position", "relative");
 
   // Define the div for the tooltip
   var tooltip = d3.select(chartWrapper).append("div")
@@ -28,7 +30,7 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
   var parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
 
   var data = [];
-  sourceData.forEach(function(item, index) {
+  config.data.forEach(function(item, index) {
     return data.push({
       date: parseDate(item.date),
       score: item.score,
@@ -39,7 +41,7 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
   if (data.length == 1) {
     data.unshift({
       "date": new Date(data[0].date.getFullYear(), data[0].date.getMonth(), data[0].date.getDate()-1),
-      "score": yAxisValue[0],
+      "score": config.yAxisValue[0],
     })
   }
 
@@ -55,8 +57,8 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
       xAxis2 = d3.axisBottom(x2),
       yAxis = d3.axisLeft(y)
         .tickSize(-width)
-        .ticks(yAxisTicksNum)
-        .tickFormat(function(d) { return d + yAxisTickFormat; });
+        .ticks(config.yAxisTicksNum)
+        .tickFormat(function(d) { return d + config.yAxisTickFormat; });
 
   // Define the brush
   var brush = d3.brushX()
@@ -107,14 +109,14 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
 
     // Scale the range of the data
     x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain(yAxisValue);
+    y.domain(config.yAxisValue);
     x2.domain(x.domain());
     y2.domain(y.domain());
 
     // Add focus (top) path
     focus.append("path")
         .datum(data)
-        .attr("class", showArea ? "area" : "aria--hidden")
+        .attr("class", config.showArea ? "area" : "aria--hidden")
         .attr("d", area);
 
     focus.append("path")
@@ -151,7 +153,7 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
         .attr("cy", function(d) { return y(d.score); })
         .on("mouseover", function(d) {
           tooltip.html(function() {
-            return tooltipContent(d.score, d.date, d.createdBy);
+            return config.tooltipContent(d.score, d.date, d.createdBy);
           });
 
           var tooltipX = +x(d.date) + margin.left + 10;
@@ -184,7 +186,7 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
 
     context.append("path")
         .datum(data)
-        .attr("class", showArea ? "area" : "aria--hidden")
+        .attr("class", config.showArea ? "area" : "aria--hidden")
         .attr("d", area2);
 
     context.append("path")
@@ -241,28 +243,30 @@ function createChart(divID, sourceData, tooltipContent, showArea, yAxisValue, yA
   render();
 }
 
-createChart (
-  divID = 'chart',
-  sourceData = myRubyData,
-  tooltipContent = function (tooltipScore, tooltipDate, tooltipCreatedBy) {
-    return "<b>Scrore: </b>" + tooltipScore + "%<br>" +
-      "<b>Date: </b>" + tooltipDate + "<br>" +
-      "<b>Scored by: </b>" + tooltipCreatedBy;
-  },
-  showArea = true,
-  yAxisValue = [0, 100],
-  yAxisTicksNum = 10,
-  yAxisTickFormat ="%"
-);
+var chart1 = document.getElementById('chart1');
 
-createChart (
-  divID = 'chart2',
-  sourceData = myRubyData2,
-  tooltipContent = function (tooltipScore) {
-    return "<b>Num: </b>" + tooltipScore + "<br>";
+createChart (chart1, {
+  data: myRubyData,
+  tooltipContent: function (tooltipScore, tooltipDate, tooltipCreatedBy) {
+      return "<b>Scrore: </b>" + tooltipScore + "%<br>" +
+        "<b>Date: </b>" + tooltipDate + "<br>" +
+        "<b>Scored by: </b>" + tooltipCreatedBy;
   },
-  showArea = true,
-  yAxisValue = [1, 4],
-  yAxisTicksNum = 4,
-  yAxisTickFormat =""
-);
+  showArea: true,
+  yAxisValue: [0, 100],
+  yAxisTicksNum: 10,
+  yAxisTickFormat: "%"
+});
+
+var chart2 = document.getElementById('chart2');
+
+createChart (chart2, {
+  data: myRubyData2,
+  tooltipContent: function (tooltipScore, tooltipDate, tooltipCreatedBy) {
+      return "<b>Scrore: </b>" + tooltipScore + "%";
+  },
+  showArea: true,
+  yAxisValue: [1, 4],
+  yAxisTicksNum: 4,
+  yAxisTickFormat: ""
+});
