@@ -18,7 +18,7 @@ function createChart(chartWrapper, config) {
 
   // Set the dimensions of the canvas / graph
   const margin = {
-    top: 20,
+    top: 0,
     right: 20,
     bottom: 110,
     left: 40,
@@ -60,7 +60,8 @@ function createChart(chartWrapper, config) {
 
   // Define the axes
   const xAxis = d3.axisBottom(x)
-    .tickSize(-topChartHeight);
+    .tickSize(-topChartHeight)
+    .tickPadding(10);
   const xAxis2 = d3.axisBottom(x2);
   const yAxis = d3.axisLeft(y)
     .tickSize(-width)
@@ -145,7 +146,6 @@ function createChart(chartWrapper, config) {
     .attr('class', 'zoom')
     .attr('width', width)
     .attr('height', topChartHeight)
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .call(zoom);
 
   d3.select(chartWrapper)
