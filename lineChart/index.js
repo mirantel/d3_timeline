@@ -104,15 +104,15 @@ function createChart(chartWrapper, config) {
     .append('rect')
     .attr('width', width)
     .attr('height', height + 10) // 10 - for dots
-    .attr('transform', 'translate( 0, -5 )'); // -5  - for dots
+    .attr('transform', 'translate( 0, -6 )'); // -6  - for dots
 
   const focus = chart.append('g')
     .attr('class', 'focus')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   const context = chart.append('g')
     .attr('class', 'context')
-    .attr('transform', 'translate(' + margin2.left + ',' + margin2.top + ')');
+    .attr('transform', `translate(${margin2.left}, ${margin2.top})`);
 
   // Scale the range of the data
   x.domain(d3.extent(data, d => d.date));
@@ -134,7 +134,7 @@ function createChart(chartWrapper, config) {
 
   focus.append('g')
     .attr('class', 'axis axis--x')
-    .attr('transform', 'translate(0,' + height + ')')
+    .attr('transform', `translate(0, ${height})`)
     .call(xAxis);
 
   focus.append('g')
@@ -145,7 +145,7 @@ function createChart(chartWrapper, config) {
     .attr('class', 'zoom')
     .attr('width', width)
     .attr('height', height)
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .call(zoom);
 
   d3.select(chartWrapper)
@@ -162,38 +162,8 @@ function createChart(chartWrapper, config) {
     .attr('class', 'dot')
     .attr('cx', d => x(d.date))
     .attr('cy', d => y(d.score))
-    .on('mouseover', function(d) {
-      tooltip.html(function() {
-      return config.tooltipContent(d.score, d.date, d.createdBy);
-      });
-
-        let tooltipX = +x(d.date) + margin.left + 10;
-        let tooltipY = +y(d.score) + margin.top;
-        let tooltipWidth = tooltip.node().offsetWidth;
-        let tooltipHeight = tooltip.node().offsetHeight;
-        let tooltipMargin = -1 * tooltipHeight / 2 + 'px 0 0 0';
-
-          if (tooltipX > width/2) {
-            tooltipX = tooltipX - tooltipWidth - 20;
-            tooltip.classed('d3-tooltip--right', true);
-          }
-          else {
-            tooltip.classed('d3-tooltip--right', false);
-          }
-
-          tooltip
-            .style('left', tooltipX + 'px')
-            .style('top', tooltipY + 'px')
-            .style('margin', tooltipMargin)
-            .transition()
-            .duration(300)
-            .style('opacity', 1);
-        })
-        .on('mouseout', function(d) {
-          tooltip.transition()
-            .duration(500)
-            .style('opacity', 0);
-        });
+    .on('mouseover', showTooltip)
+    .on('mouseout', hideTooltip);
 
   context.append('path')
     .datum(data)
@@ -208,7 +178,7 @@ function createChart(chartWrapper, config) {
 
   context.append('g')
     .attr('class', 'axis axis--x')
-    .attr('transform', 'translate(0,' + height2 + ')')
+    .attr('transform', `translate(0, ${height2})`)
     .call(xAxis2);
 
   context.append('g')
@@ -217,36 +187,67 @@ function createChart(chartWrapper, config) {
     .call(brush.move, x.range());
 
   function render() {
-    console.log('Render!');
+    // console.log('Render!');
   }
 
   function resize() {
-    console.log('Resize!');
+    // console.log('Resize!');
 
     render();
   }
 
+  function showTooltip(d) {
+    tooltip.html(() => config.tooltipContent(d.score, d.date, d.createdBy));
+
+    let tooltipX = +x(d.date) + margin.left + 10;
+    const tooltipY = +y(d.score) + margin.top;
+    const tooltipWidth = tooltip.node().offsetWidth;
+    const tooltipHeight = tooltip.node().offsetHeight;
+    const tooltipMargin = `${(-1 * tooltipHeight) / 2}px 0 0 0`;
+
+    if (tooltipX > width / 2) {
+      tooltipX = tooltipX - tooltipWidth - 20;
+      tooltip.classed('d3-tooltip--right', true);
+    } else {
+      tooltip.classed('d3-tooltip--right', false);
+    }
+
+    tooltip
+      .style('left', `${tooltipX}px`)
+      .style('top', `${tooltipY}px`)
+      .style('margin', tooltipMargin)
+      .transition()
+      .duration(300)
+      .style('opacity', 1);
+  }
+
+  function hideTooltip() {
+    tooltip.transition()
+      .duration(500)
+      .style('opacity', 0)
+  }
+
   function brushed() {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
-    var s = d3.event.selection || x2.range();
+    const s = d3.event.selection || x2.range();
     x.domain(s.map(x2.invert, x2));
     focus.select('.area').attr('d', area);
     focus.select('.axis--x').call(xAxis);
     focus.select('.line').attr('d', line);
-    focus.selectAll('.dot').attr('cx', function(d) { return x(d.date); });
+    focus.selectAll('.dot').attr('cx', d => x(d.date));
     chart.select('.zoom').call(zoom.transform, d3.zoomIdentity
-        .scale(width / (s[1] - s[0]))
-        .translate(-s[0], 0));
+      .scale(width / (s[1] - s[0]))
+      .translate(-s[0], 0));
   }
 
   function zoomed() {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') return; // ignore zoom-by-brush
-    let t = d3.event.transform;
+    const t = d3.event.transform;
     x.domain(t.rescaleX(x2).domain());
     focus.select('.area').attr('d', area);
     focus.select('.axis--x').call(xAxis);
     focus.select('.line').attr('d', line);
-    focus.selectAll('.dot').attr('cx', function(d) { return x(d.date); });
+    focus.selectAll('.dot').attr('cx', d => x(d.date));
     context.select('.brush').call(brush.move, x.range().map(t.invertX, t));
   }
 
@@ -258,11 +259,10 @@ const chart1 = document.getElementById('chart1');
 
 createChart(chart1, {
   data: myRubyData,
-  tooltipContent: function (tooltipScore, tooltipDate, tooltipCreatedBy) {
-      return '<b>Scrore: </b>' + tooltipScore + '%<br>' +
-        '<b>Date: </b>' + tooltipDate + '<br>' +
-        '<b>Scored by: </b>' + tooltipCreatedBy;
-  },
+  tooltipContent: (tooltipScore, tooltipDate, tooltipCreatedBy) =>
+    `<b>Scrore: </b>${tooltipScore}%<br>
+     <b>Date: </b>${tooltipDate}<br>
+     <b>Scored by: </b>${tooltipCreatedBy}`,
   showArea: true,
   yAxisValue: [0, 100],
   yAxisTicksNum: 10,
@@ -273,9 +273,8 @@ const chart2 = document.getElementById('chart2');
 
 createChart(chart2, {
   data: myRubyData2,
-  tooltipContent: function (tooltipScore, tooltipDate, tooltipCreatedBy) {
-      return '<b>Scrore: </b>' + tooltipScore + '%';
-  },
+  tooltipContent: (tooltipScore, tooltipDate, tooltipCreatedBy) =>
+    `<b>Scrore: </b>${tooltipScore}%`,
   showArea: true,
   yAxisValue: [1, 4],
   yAxisTicksNum: 4,

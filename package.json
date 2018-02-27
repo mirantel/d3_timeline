@@ -1,19 +1,21 @@
 {
-  "name": "Learn D3 Chart",
+  "name": "learn-d3",
   "version": "0.1.0",
   "description": "Node.js package manager config",
   "main": "gulpfile.js",
   "repository": {
     "type": "git",
-    "url": "http://github.com/npm/npm.git"
+    "url": "git+ssh://git@github.com/npm/npm.git"
   },
   "devDependencies": {
     "del": "^1.2.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
-    "gulp-connect": "^5.0.0",
+    "gulp-connect": "^5.5.0",
     "open": "0.0.5",
-    "require-dir": "^0.3.0",
+    "require-dir": "^1.0.0",
     "run-sequence": "^1.2.2"
   },
   "scripts": {
@@ -23,8 +25,10 @@
   "author": "Svitalana Pylypenko",
   "license": "MIT",
   "dependencies": {
-    "eslint": "^4.18.1",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.9.0"
-  }
+    "eslint": "^4.18.1"
+  },
+  "bugs": {
+    "url": "https://github.com/npm/npm/issues"
+  },
+  "homepage": "https://github.com/npm/npm#readme"
 }
