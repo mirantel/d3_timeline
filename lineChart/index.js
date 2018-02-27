@@ -30,8 +30,8 @@ function createChart(chartWrapper, config) {
     left: 40,
   };
   const width = +chart.attr('width') - margin.left - margin.right;
-  const height = +chart.attr('height') - margin.top - margin.bottom;
-  const height2 = +chart.attr('height') - margin2.top - margin2.bottom;
+  const topChartHeight = +chart.attr('height') - margin.top - margin.bottom;
+  const timelineHeight = +chart.attr('height') - margin2.top - margin2.bottom;
 
   // Parse the date / time
   const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
@@ -55,12 +55,12 @@ function createChart(chartWrapper, config) {
   // Set the ranges
   const x = d3.scaleTime().range([0, width]);
   const x2 = d3.scaleTime().range([0, width]);
-  const y = d3.scaleLinear().range([height, 0]);
-  const y2 = d3.scaleLinear().range([height2, 0]);
+  const y = d3.scaleLinear().range([topChartHeight, 0]);
+  const y2 = d3.scaleLinear().range([timelineHeight, 0]);
 
   // Define the axes
   const xAxis = d3.axisBottom(x)
-    .tickSize(-height);
+    .tickSize(-topChartHeight);
   const xAxis2 = d3.axisBottom(x2);
   const yAxis = d3.axisLeft(y)
     .tickSize(-width)
@@ -69,26 +69,26 @@ function createChart(chartWrapper, config) {
 
   // Define the brush
   const brush = d3.brushX()
-    .extent([[0, 0], [width, height2]])
+    .extent([[0, 0], [width, timelineHeight]])
     .on('brush end', brushed);
 
   // Define the zoom
   const zoom = d3.zoom()
     .scaleExtent([1, Infinity])
-    .translateExtent([[0, 0], [width, height]])
-    .extent([[0, 0], [width, height]])
+    .translateExtent([[0, 0], [width, topChartHeight]])
+    .extent([[0, 0], [width, topChartHeight]])
     .on('zoom', zoomed);
 
   const area = d3.area()
     .curve(d3.curveLinear)
     .x(d => x(d.date))
-    .y0(height)
+    .y0(topChartHeight)
     .y1(d => y(d.score));
 
   const area2 = d3.area()
     .curve(d3.curveLinear)
     .x(d => x2(d.date))
-    .y0(height2)
+    .y0(timelineHeight)
     .y1(d => y2(d.score));
 
   const line = d3.line()
@@ -103,7 +103,7 @@ function createChart(chartWrapper, config) {
     .attr('id', 'clip')
     .append('rect')
     .attr('width', width)
-    .attr('height', height + 10) // 10 - for dots
+    .attr('height', topChartHeight + 10) // 10 - for dots
     .attr('transform', 'translate( 0, -6 )'); // -6  - for dots
 
   const focus = chart.append('g')
@@ -134,7 +134,7 @@ function createChart(chartWrapper, config) {
 
   focus.append('g')
     .attr('class', 'axis axis--x')
-    .attr('transform', `translate(0, ${height})`)
+    .attr('transform', `translate(0, ${topChartHeight})`)
     .call(xAxis);
 
   focus.append('g')
@@ -144,7 +144,7 @@ function createChart(chartWrapper, config) {
   focus.append('rect')
     .attr('class', 'zoom')
     .attr('width', width)
-    .attr('height', height)
+    .attr('height', topChartHeight)
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .call(zoom);
 
@@ -178,7 +178,7 @@ function createChart(chartWrapper, config) {
 
   context.append('g')
     .attr('class', 'axis axis--x')
-    .attr('transform', `translate(0, ${height2})`)
+    .attr('transform', `translate(0, ${timelineHeight})`)
     .call(xAxis2);
 
   context.append('g')
@@ -258,7 +258,7 @@ function createChart(chartWrapper, config) {
 const chart1 = document.getElementById('chart1');
 
 createChart(chart1, {
-  data: myRubyData,
+  data: myData,
   tooltipContent: (tooltipScore, tooltipDate, tooltipCreatedBy) =>
     `<b>Scrore: </b>${tooltipScore}%<br>
      <b>Date: </b>${tooltipDate}<br>
@@ -272,7 +272,7 @@ createChart(chart1, {
 const chart2 = document.getElementById('chart2');
 
 createChart(chart2, {
-  data: myRubyData2,
+  data: myData2,
   tooltipContent: (tooltipScore, tooltipDate, tooltipCreatedBy) =>
     `<b>Scrore: </b>${tooltipScore}%`,
   showArea: true,
