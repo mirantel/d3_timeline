@@ -80,7 +80,7 @@ function createChart(chartWrapper, config) {
 
   // Define the zoom
   const zoom = d3.zoom()
-    .scaleExtent([1, Infinity])
+    .scaleExtent([1, data.length*12])
     .translateExtent([[dotPlaceholder, 0], [graphWidth, topChartHeight]])
     .extent([[dotPlaceholder, 0], [graphWidth, topChartHeight]])
     .on('zoom', zoomed);
@@ -235,14 +235,15 @@ function createChart(chartWrapper, config) {
   function brushed() {
     if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
     const s = d3.event.selection || x2.range();
+    const ratio = (graphWidth - 6) / (s[1] - s[0]);
     x.domain(s.map(x2.invert, x2));
     focus.select('.area').attr('d', area);
     focus.select('.axis--x').call(xAxis);
     focus.select('.line').attr('d', line);
     focus.selectAll('.dot').attr('cx', d => x(d.date));
     chart.select('.zoom').call(zoom.transform, d3.zoomIdentity
-      .scale((width - (dotPlaceholder * 2)) / (s[1] - s[0]))
-      .translate(-s[0] + dotPlaceholder, 0));
+      .scale(ratio)
+      .translate(-s[0] + (dotPlaceholder / ratio), 0));
   }
 
   function zoomed() {
