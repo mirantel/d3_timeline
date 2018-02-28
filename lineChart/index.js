@@ -7,6 +7,9 @@ function createChart(chartWrapper, config) {
   const wrapperWidth = chartWrapper.clientWidth;
   const wrapperHeight = chartWrapper.clientHeight;
 
+  const dotSize = 4;
+  const dotPlaceholder = 6;
+
   chart
     .attr('width', wrapperWidth)
     .attr('height', wrapperHeight);
@@ -18,7 +21,7 @@ function createChart(chartWrapper, config) {
 
   // Set the dimensions of the canvas / graph
   const margin = {
-    top: 0,
+    top: 10,
     right: 20,
     bottom: 110,
     left: 40,
@@ -30,6 +33,7 @@ function createChart(chartWrapper, config) {
     left: 40,
   };
   const width = +chart.attr('width') - margin.left - margin.right;
+  const graphWidth = width - dotPlaceholder;
   const topChartHeight = +chart.attr('height') - margin.top - margin.bottom;
   const timelineHeight = +chart.attr('height') - margin2.top - margin2.bottom;
 
@@ -53,14 +57,15 @@ function createChart(chartWrapper, config) {
   }
 
   // Set the ranges
-  const x = d3.scaleTime().range([0, width]);
-  const x2 = d3.scaleTime().range([0, width]);
+  const x = d3.scaleTime().range([dotPlaceholder, graphWidth]);
+  const x2 = d3.scaleTime().range([dotPlaceholder, graphWidth]);
   const y = d3.scaleLinear().range([topChartHeight, 0]);
   const y2 = d3.scaleLinear().range([timelineHeight, 0]);
 
   // Define the axes
   const xAxis = d3.axisBottom(x)
     .tickSize(-topChartHeight)
+    .tickSizeOuter(0)
     .tickPadding(10);
   const xAxis2 = d3.axisBottom(x2);
   const yAxis = d3.axisLeft(y)
@@ -70,14 +75,14 @@ function createChart(chartWrapper, config) {
 
   // Define the brush
   const brush = d3.brushX()
-    .extent([[0, 0], [width, timelineHeight]])
+    .extent([[dotPlaceholder, 0], [graphWidth, timelineHeight]])
     .on('brush end', brushed);
 
   // Define the zoom
   const zoom = d3.zoom()
     .scaleExtent([1, Infinity])
-    .translateExtent([[0, 0], [width, topChartHeight]])
-    .extent([[0, 0], [width, topChartHeight]])
+    .translateExtent([[dotPlaceholder, 0], [graphWidth, topChartHeight]])
+    .extent([[dotPlaceholder, 0], [graphWidth, topChartHeight]])
     .on('zoom', zoomed);
 
   const area = d3.area()
@@ -104,8 +109,8 @@ function createChart(chartWrapper, config) {
     .attr('id', 'clip')
     .append('rect')
     .attr('width', width)
-    .attr('height', topChartHeight + 10) // 10 - for dots
-    .attr('transform', 'translate( 0, -6 )'); // -6  - for dots
+    .attr('height', topChartHeight + (dotPlaceholder * 2))
+    .attr('transform', `translate( 0, -${dotPlaceholder} )`);
 
   const focus = chart.append('g')
     .attr('class', 'focus')
@@ -158,7 +163,7 @@ function createChart(chartWrapper, config) {
     .data(data)
     .enter()
     .append('circle')
-    .attr('r', 4)
+    .attr('r', dotSize)
     .attr('class', 'dot')
     .attr('cx', d => x(d.date))
     .attr('cy', d => y(d.score))
@@ -236,8 +241,8 @@ function createChart(chartWrapper, config) {
     focus.select('.line').attr('d', line);
     focus.selectAll('.dot').attr('cx', d => x(d.date));
     chart.select('.zoom').call(zoom.transform, d3.zoomIdentity
-      .scale(width / (s[1] - s[0]))
-      .translate(-s[0], 0));
+      .scale((width - (dotPlaceholder * 2)) / (s[1] - s[0]))
+      .translate(-s[0] + dotPlaceholder, 0));
   }
 
   function zoomed() {
@@ -274,7 +279,7 @@ const chart2 = document.getElementById('chart2');
 createChart(chart2, {
   data: myData2,
   tooltipContent: (tooltipScore, tooltipDate, tooltipCreatedBy) =>
-    `<b>Scrore: </b>${tooltipScore}%`,
+    `<b>Scrore: </b>${tooltipScore}`,
   showArea: true,
   yAxisValue: [1, 4],
   yAxisTicksNum: 4,

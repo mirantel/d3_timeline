@@ -74,11 +74,11 @@ const myData2 = [{
   date: '2018-01-30T11:19:40.537Z',
   created_by: 'Lana',
 }, {
-  score: 2.4,
+  score: 1,
   date: '2018-02-02T13:51:39.589Z',
   created_by: 'Lana',
 }, {
-  score: 1,
+  score: 2.4,
   date: '2018-02-03T13:52:52.941Z',
   created_by: 'Lana',
 },
