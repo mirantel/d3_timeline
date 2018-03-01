@@ -21,7 +21,7 @@ function createChart(chartWrapper, config) {
 
   // Set the dimensions of the canvas / graph
   const margin = {
-    top: 10,
+    top: 5,
     right: 20,
     bottom: 110,
     left: 40,
@@ -105,8 +105,9 @@ function createChart(chartWrapper, config) {
     .x(d => x2(d.date))
     .y(d => y2(d.score));
 
+  const clipId = `clip-${Math.floor(Math.random() * 100000)}`;
   chart.append('defs').append('clipPath')
-    .attr('id', 'clip')
+    .attr('id', clipId)
     .append('rect')
     .attr('width', width)
     .attr('height', topChartHeight + (dotPlaceholder * 2))
@@ -127,15 +128,19 @@ function createChart(chartWrapper, config) {
   y2.domain(y.domain());
 
   // Add focus (top) path
-  focus.append('path')
-    .datum(data)
-    .attr('class', config.showArea ? 'area' : 'aria--hidden')
-    .attr('d', area);
+  if (config.showArea) {
+    focus.append('path')
+      .datum(data)
+      .attr('class', 'area')
+      .attr('clip-path', `url(#${clipId})`)
+      .attr('d', area);
+  }
 
   focus.append('path')
     .datum(data)
     .attr('fill', 'none')
     .attr('class', 'line')
+    .attr('clip-path', `url(#${clipId})`)
     .attr('d', line);
 
   focus.append('g')
@@ -159,6 +164,7 @@ function createChart(chartWrapper, config) {
   // Add the scatterplot
   focus.append('g')
     .attr('class', 'dots')
+    .attr('clip-path', `url(#${clipId})`)
     .selectAll('dot')
     .data(data)
     .enter()
@@ -170,15 +176,19 @@ function createChart(chartWrapper, config) {
     .on('mouseover', showTooltip)
     .on('mouseout', hideTooltip);
 
-  context.append('path')
-    .datum(data)
-    .attr('class', config.showArea ? 'area' : 'aria--hidden')
-    .attr('d', area2);
+  if (config.showArea) {
+    context.append('path')
+      .datum(data)
+      .attr('class', 'area')
+      .attr('clip-path', `url(#${clipId})`)
+      .attr('d', area2);
+  }
 
   context.append('path')
     .datum(data)
     .attr('fill', 'none')
     .attr('class', 'line')
+    .attr('clip-path', `url(#${clipId})`)
     .attr('d', line2);
 
   context.append('g')
@@ -229,7 +239,7 @@ function createChart(chartWrapper, config) {
   function hideTooltip() {
     tooltip.transition()
       .duration(500)
-      .style('opacity', 0)
+      .style('opacity', 0);
   }
 
   function brushed() {
