@@ -1,5 +1,31 @@
 // Graph Tests Data
-const myData = [{
+const Data1 = [{
+  score: 2,
+  date: '2018-01-20T13:07:15.038Z',
+  created_by: 'Tesla',
+}, {
+  score: 4,
+  date: '2018-01-21T11:16:35.002Z',
+  created_by: 'Lana',
+}, {
+  score: 2.1,
+  date: '2018-01-30T11:19:40.537Z',
+  created_by: 'Lana',
+}];
+const Data2 = [{
+  score: 1,
+  date: '2018-01-20T13:07:15.038Z',
+  created_by: 'Mars',
+}, {
+  score: 3.1,
+  date: '2018-01-21T11:16:35.002Z',
+  created_by: 'Lana',
+}, {
+  score: 4,
+  date: '2018-01-30T11:19:40.537Z',
+  created_by: 'Lana',
+}];
+const scoreData = [{
   score: 85.71,
   date: '2018-01-20T13:07:15.038Z',
   created_by: 'Tesla',
@@ -60,49 +86,3 @@ const myData = [{
   date: '2018-02-15T16:16:54.905Z',
   created_by: 'Lana',
 }];
-
-const myData2 = [{
-  score: 1.8,
-  date: '2018-01-20T13:07:15.038Z',
-  created_by: 'Mars',
-}, {
-  score: 3.1,
-  date: '2018-01-21T11:16:35.002Z',
-  created_by: 'Lana',
-}, {
-  score: 4,
-  date: '2018-01-30T11:19:40.537Z',
-  created_by: 'Lana',
-}, {
-  score: 1,
-  date: '2018-02-02T13:51:39.589Z',
-  created_by: 'Lana',
-}, {
-  score: 2.4,
-  date: '2018-02-03T13:52:52.941Z',
-  created_by: 'Lana',
-},
-];
-
-const myData3 = [{
-  score: 1.8,
-  date: '2018-01-20T13:07:15.038Z',
-  created_by: 'Mars',
-}, {
-  score: 3.1,
-  date: '2018-01-21T11:16:35.002Z',
-  created_by: 'Lana',
-}, {
-  score: 4,
-  date: '2018-01-30T11:19:40.537Z',
-  created_by: 'Lana',
-}, {
-  score: 2.4,
-  date: '2018-02-02T13:51:39.589Z',
-  created_by: 'Lana',
-}, {
-  score: 1,
-  date: '2018-02-03T13:52:52.941Z',
-  created_by: 'Lana',
-},
-];

@@ -212,7 +212,7 @@ function createChart(chartWrapper, config) {
   }
 
   function showTooltip(d) {
-    tooltip.html(() => config.tooltipContent(d.score, d.date, d.createdBy));
+    tooltip.html(() => config.tooltipContent(d));
 
     let tooltipX = +x(d.date) + margin.left + 10;
     const tooltipY = +y(d.score) + margin.top;
@@ -272,27 +272,28 @@ function createChart(chartWrapper, config) {
 }
 
 const chart1 = document.getElementById('chart1');
-
+const initialData = eval(d3.select('#select').property('value'));
 createChart(chart1, {
-  data: myData,
-  tooltipContent: (tooltipScore, tooltipDate, tooltipCreatedBy) =>
-    `<b>Scrore: </b>${tooltipScore}%<br>
-     <b>Date: </b>${tooltipDate}<br>
-     <b>Scored by: </b>${tooltipCreatedBy}`,
-  showArea: true,
-  yAxisValue: [0, 100],
-  yAxisTicksNum: 10,
-  yAxisTickFormat: '%',
-});
-
-const chart2 = document.getElementById('chart2');
-
-createChart(chart2, {
-  data: myData2,
-  tooltipContent: (tooltipScore, tooltipDate, tooltipCreatedBy) =>
-    `<b>Scrore: </b>${tooltipScore}`,
+  data: initialData,
+  tooltipContent: d =>
+    `<b>Scrore: </b>${d.score}%<br>
+     <b>Date: </b>${d.date}<br>
+     <b>Scored by: </b>${d.createdBy}`,
   showArea: true,
   yAxisValue: [1, 4],
   yAxisTicksNum: 4,
   yAxisTickFormat: '',
+});
+
+const chart2 = document.getElementById('chart2');
+createChart(chart2, {
+  data: scoreData,
+  tooltipContent: d =>
+    `<b>Scrore: </b>${d.score}%<br>
+     <b>Date: </b>${d.date}<br>
+     <b>Scored by: </b>${d.createdBy}`,
+  showArea: true,
+  yAxisValue: [0, 100],
+  yAxisTicksNum: 10,
+  yAxisTickFormat: '%',
 });
