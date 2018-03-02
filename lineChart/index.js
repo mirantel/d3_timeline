@@ -40,14 +40,14 @@ function createChart(chartWrapper, config) {
   // Parse the date / time
   const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
 
-  const data = [];
-  config.data.forEach((item) => {
-    return data.push({
-      date: parseDate(item.date),
-      score: item.score,
-      createdBy: item.created_by,
-    });
-  });
+  const data = parseData(config.data);
+  // config.data.forEach((item) => {
+  //   return data.push({
+  //     date: parseDate(item.date),
+  //     score: item.score,
+  //     createdBy: item.created_by,
+  //   });
+  // });
 
   if (data.length === 1) {
     data.unshift({
@@ -209,6 +209,18 @@ function createChart(chartWrapper, config) {
     // console.log('Resize!');
 
     render();
+  }
+
+  function parseData(sourseData) {
+    let data = []
+    sourseData.forEach((item) => {
+      return data.push({
+        date: parseDate(item.date),
+        score: item.score,
+        createdBy: item.created_by,
+      });
+    });
+    return data;
   }
 
   function showTooltip(d) {
