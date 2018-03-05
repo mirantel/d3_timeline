@@ -1,7 +1,31 @@
+function parseData(sourseData) {
+  if (sourseData) {
+    const d = [];
+    const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
+    sourseData.forEach((item) => {
+      return d.push({
+        date: parseDate(item.date),
+        score: item.score,
+        createdBy: item.created_by,
+      });
+    });
+    if (d.length === 1) {
+      d.unshift({
+        date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
+        score: config.yAxisValue[0],
+      });
+    }
+    return d;
+  }
+}
+
 class timeline {
   constructor(chartWrapper, config) {
+    this.config = config;
+    parseData.bind(this)();
     const data = parseData(config.data);
-    const svg = d3.select(chartWrapper).append('svg');
+    this.svg = d3.select(chartWrapper).append('svg')
+    const svg = this.svg;
     this.wrapperWidth = chartWrapper.clientWidth;
     this.wrapperHeight = chartWrapper.clientHeight;
 
@@ -13,7 +37,7 @@ class timeline {
       .attr('class', 'd3-tooltip')
       .style('opacity', 0);
 
-    const dotSize = 4;
+    this.dotSize = 4;
     const dotPlaceholder = 6;
     let timelineHeight = 75;
 
@@ -35,17 +59,23 @@ class timeline {
     const chartHeight = this.wrapperHeight - chartMargin.top - chartMargin.bottom;
 
     // Set the ranges
-    const x = d3.scaleTime().range([dotPlaceholder, graphWidth]);
-    const x2 = d3.scaleTime().range([dotPlaceholder, graphWidth]);
-    const y = d3.scaleLinear().range([chartHeight, 0]);
-    const y2 = d3.scaleLinear().range([timelineHeight, 0]);
+    this.x = d3.scaleTime().range([dotPlaceholder, graphWidth]);
+    const x = this.x;
+    this.x2 = d3.scaleTime().range([dotPlaceholder, graphWidth]);
+    const x2 = this.x2;
+    this.y = d3.scaleLinear().range([chartHeight, 0]);
+    const y = this.y;
+    this.y2 = d3.scaleLinear().range([timelineHeight, 0]);
+    const y2 = this.y2;
 
     // Define the axes
-    const xAxis = d3.axisBottom(x)
+    this.xAxis = d3.axisBottom(x)
       .tickSize(-chartHeight)
       .tickSizeOuter(0)
       .tickPadding(10);
-    const xAxis2 = d3.axisBottom(x2);
+    const xAxis = this.xAxis;
+    this.xAxis2 = d3.axisBottom(x2);
+    const xAxis2 = this.xAxis2;
     const yAxis = d3.axisLeft(y)
       .tickSize(-width)
       .ticks(config.yAxisTicksNum)
@@ -63,11 +93,12 @@ class timeline {
       .extent([[dotPlaceholder, 0], [graphWidth, this.hartHeight]])
       .on('zoom', zoomed);
 
-    const chartArea = d3.area()
+    this.chartArea = d3.area()
       .curve(d3.curveLinear)
       .x(d => x(d.date))
       .y0(chartHeight)
       .y1(d => y(d.score));
+    const chartArea = this.chartArea;
 
     this.timelineArea = d3.area()
       .curve(d3.curveLinear)
@@ -75,9 +106,10 @@ class timeline {
       .y0(timelineHeight)
       .y1(d => y2(d.score));
 
-    const chartLine = d3.line()
+    this.chartLine = d3.line()
       .x(d => x(d.date))
       .y(d => y(d.score));
+    const chartLine = this.chartLine;
 
     this.timelineLine = d3.line()
       .x(d => x2(d.date))
@@ -146,7 +178,7 @@ class timeline {
       .data(data)
       .enter()
       .append('circle')
-      .attr('r', dotSize)
+      .attr('r', this.dotSize)
       .attr('class', 'dot')
       .attr('cx', d => x(d.date))
       .attr('cy', d => y(d.score))
@@ -177,25 +209,6 @@ class timeline {
       .attr('class', 'brush')
       .call(brush)
       .call(brush.move, x.range());
-
-    function parseData(sourseData) {
-      const data = [];
-      const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
-      sourseData.forEach((item) => {
-        return data.push({
-          date: parseDate(item.date),
-          score: item.score,
-          createdBy: item.created_by,
-        });
-      });
-      if (data.length === 1) {
-        data.unshift({
-          date: new Date(data[0].date.getFullYear(), data[0].date.getMonth(), data[0].date.getDate() - 1),
-          score: config.yAxisValue[0],
-        });
-      }
-      return data;
-    }
 
     function showTooltip(d) {
       tooltip.html(() => config.tooltipContent(d));
@@ -253,6 +266,63 @@ class timeline {
       context.select('.brush').call(brush.move, x.range().map(t.invertX, t));
     }
   }
+
+  update(newData) {
+    const nnewData = parseData(newData);
+    const focus = this.svg.select('.focus');
+    const context = this.svg.select('.context');
+
+    this.x.domain(d3.extent(nnewData, d => d.date));
+    this.y.domain(this.config.yAxisValue);
+    this.x2.domain(this.x.domain());
+    this.y2.domain(this.y.domain());
+
+    focus.select('.axis--x')
+      .transition()
+      .call(this.xAxis);
+
+    context.select('.axis--x')
+      .transition()
+      .call(this.xAxis2);
+
+    focus.select('.line')
+      .datum(nnewData)
+      .transition()
+      .attr('d', this.chartLine);
+
+    focus.select('.area')
+      .datum(nnewData)
+      .transition()
+      .attr('d', this.chartArea);
+
+    context.select('.line')
+      .datum(nnewData)
+      .transition()
+      .attr('d', this.timelineLine);
+
+    context.select('.area')
+      .datum(nnewData)
+      .transition()
+      .attr('d', this.timelineArea);
+
+    const dots = focus.selectAll('.dot')
+      .data(nnewData);
+
+    dots.enter()
+      .append('circle')
+      .transition()
+      .attr('r', this.dotSize)
+      .attr('class', 'dot')
+      .attr('cx', d => this.x(d.date))
+      .attr('cy', d => this.y(d.score));
+
+    dots.transition()
+      .attr('cx', d => this.x(d.date))
+      .attr('cy', d => this.y(d.score));
+
+    dots.exit()
+      .remove();
+  }
 }
 
 const chart1Wrapper = document.getElementById('chart1');
@@ -269,8 +339,15 @@ const chart1 = new timeline(chart1Wrapper, {
   yAxisTickFormat: '',
 });
 
-const chart2 = document.getElementById('chart2');
-createChart(chart2, {
+d3.select('#select')
+  .on('change', function() {
+    const newData = eval(d3.select(this).property('value'));
+    chart1.update(newData);
+});
+
+
+const chart2Wrapper = document.getElementById('chart2');
+const chart2 = new timeline(chart2Wrapper, {
   data: scoreData,
   tooltipContent: d =>
     `<b>Scrore: </b>${d.score}%<br>
