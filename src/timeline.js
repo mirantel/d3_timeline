@@ -82,9 +82,10 @@ class timeline {
       .tickFormat(d => d + config.yAxisTickFormat);
 
     // Define the brush
-    const brush = d3.brushX()
+    this.brush = d3.brushX()
       .extent([[dotPlaceholder, 0], [graphWidth, timelineHeight]])
       .on('brush end', brushed);
+    const brush = this.brush;
 
     // Define the zoom
     const zoom = d3.zoom()
@@ -285,24 +286,23 @@ class timeline {
       .transition()
       .call(this.xAxis2);
 
+    context.select('.brush')
+      .call(this.brush.move, null);
+
     focus.select('.line')
       .datum(updatedData)
-      .transition()
       .attr('d', this.chartLine);
 
     focus.select('.area')
       .datum(updatedData)
-      .transition()
       .attr('d', this.chartArea);
 
     context.select('.line')
       .datum(updatedData)
-      .transition()
       .attr('d', this.timelineLine);
 
     context.select('.area')
       .datum(updatedData)
-      .transition()
       .attr('d', this.timelineArea);
 
     const dots = focus.select('.dots').selectAll('.dot')
@@ -310,13 +310,12 @@ class timeline {
 
     dots.enter()
       .append('circle')
-      .transition()
       .attr('r', this.dotSize)
       .attr('class', 'dot')
       .attr('cx', d => this.x(d.date))
       .attr('cy', d => this.y(d.score));
 
-    dots.transition()
+    dots
       .attr('cx', d => this.x(d.date))
       .attr('cy', d => this.y(d.score));
 
