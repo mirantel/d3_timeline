@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Line Chart</title>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    *, *:before, *:after {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    .area {
+      fill: rgba(0, 162, 237, .4);
+    }
+
+    .line {
+      stroke: #008cc7;
+      stroke-width: 2px;
+    }
+
+    .zoom {
+      cursor: move;
+      fill: none;
+      pointer-events: all;
+      stroke: #d2d2d2;
+    }
+
+    .dot {
+      stroke: #008cc7;
+      stroke-width: 2px;
+      fill: #fff;
+    }
+
+    .dot:hover {
+      r: 5;
+    }
+
+    .domain,
+    .tick line,
+    .overlay {
+      stroke: rgba(0, 0, 0, 0.15);
+    }
+
+    .tick text {
+      font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+      font-size: 12px;
+      fill: #666;
+    }
+
+    .selection {
+      stroke-width: 0;
+    }
+
+    .axisLine {
+      fill: none;
+      shape-rendering: crispEdges;
+      stroke: rgba(0, 0, 0, 0.5);
+      stroke-width: 2px;
+    }
+
+    .d3-tip.n:after {
+      margin: -1px 0 0 0;
+      top: 100%;
+      left: 0;
+    }
+
+    .d3-tooltip {
+      position: absolute;
+      min-height: 20px;
+      min-width: 30px;
+      padding: 6px;
+      font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      font-size: 12px;
+      line-height: 14px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border-radius: 5px;
+      pointer-events: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .d3-tooltip:before {
+      border: 5px solid transparent;
+      display: block;
+      border-right-color: rgba(0, 0, 0, 0.8);
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -10px;
+      margin-top: -5px;
+    }
+
+    .d3-tooltip--right:before {
+      left: auto;
+      right: -10px;
+      border-color: transparent transparent transparent rgba(0, 0, 0, 0.8);
+    }
+
+    #chart1 {
+      height: 300px;
+    }
+
+    #chart2 {
+      height: 400px;
+    }
+</style>
+</head>
+<body>
+  <select name="" id="select">
+    <option value="Data1">Data1</option>
+    <option value="Data2">Data2</option>
+  </select>
+  <div id="chart1"></div>
+  <div id="chart2"></div>
+  <script src="data.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

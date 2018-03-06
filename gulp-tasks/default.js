@@ -2,11 +2,14 @@ const gulp = require('gulp');
 const runSequence = require('run-sequence');
 
 gulp.task('default', (done) => {
-    runSequence(
-        [
-            'connect',
-            'watch'
-        ],
-        done
-    );
+  runSequence(
+    'clean',
+    [
+      'js:build',
+      'html:copy',
+      'connect',
+      'watch'
+    ],
+    done
+  );
 });

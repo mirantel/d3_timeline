@@ -4,14 +4,15 @@ const paths = require('./paths');
 const open = require('open');
 
 gulp.task('connect', () => {
-    connect.server({
-        root: './lineChart',
-        port: 5050,
-        livereload: true
-    });
-    open('http://localhost:5050/');
+  connect.server({
+    root: './public',
+    port: 5050,
+    livereload: true
+  });
+  open('http://localhost:5050/');
 });
 
 gulp.task('watch', () => {
-    gulp.watch(paths.lineChart, ['lineChart:reload']);
+  gulp.watch(paths.html, ['html:copy']);
+  gulp.watch(paths.jsWatch, ['js:build']);
 });
