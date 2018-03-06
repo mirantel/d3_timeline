@@ -267,12 +267,12 @@ class timeline {
     }
   }
 
-  update(newData) {
-    const nnewData = parseData(newData);
+  update(data) {
+    const updatedData = parseData(data);
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
 
-    this.x.domain(d3.extent(nnewData, d => d.date));
+    this.x.domain(d3.extent(updatedData, d => d.date));
     this.y.domain(this.config.yAxisValue);
     this.x2.domain(this.x.domain());
     this.y2.domain(this.y.domain());
@@ -286,27 +286,27 @@ class timeline {
       .call(this.xAxis2);
 
     focus.select('.line')
-      .datum(nnewData)
+      .datum(updatedData)
       .transition()
       .attr('d', this.chartLine);
 
     focus.select('.area')
-      .datum(nnewData)
+      .datum(updatedData)
       .transition()
       .attr('d', this.chartArea);
 
     context.select('.line')
-      .datum(nnewData)
+      .datum(updatedData)
       .transition()
       .attr('d', this.timelineLine);
 
     context.select('.area')
-      .datum(nnewData)
+      .datum(updatedData)
       .transition()
       .attr('d', this.timelineArea);
 
-    const dots = focus.selectAll('.dot')
-      .data(nnewData);
+    const dots = focus.select('.dots').selectAll('.dot')
+      .data(updatedData);
 
     dots.enter()
       .append('circle')
