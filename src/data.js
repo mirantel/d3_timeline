@@ -1,41 +1,43 @@
 // Graph Tests Data
-const Data1 = [{
-  score: 2,
-  date: '2018-01-20T13:07:15.038Z',
-  created_by: 'Tesla',
-}, {
-  score: 4,
-  date: '2018-01-21T11:16:35.002Z',
-  created_by: 'Lana',
-}, {
-  score: 2.1,
-  date: '2018-01-30T11:19:40.537Z',
-  created_by: 'Lana',
-}];
+const multipleData = {
+  'Data 1': [{
+    score: 2,
+    date: '2018-01-20T13:07:15.038Z',
+    created_by: 'Tesla',
+  }, {
+    score: 4,
+    date: '2018-01-21T11:16:35.002Z',
+    created_by: 'Lana',
+  }, {
+    score: 2.1,
+    date: '2018-01-30T11:19:40.537Z',
+    created_by: 'Lana',
+  }],
 
-const Data2 = [{
-  score: 1,
-  date: '2018-01-20T13:07:15.038Z',
-  created_by: 'Tesla',
-}, {
-  score: 2,
-  date: '2018-01-28T11:16:35.002Z',
-  created_by: 'Lana',
-}, {
-  score: 4,
-  date: '2018-01-30T11:19:40.537Z',
-  created_by: 'Lana',
-}, {
-  score: 2,
-  date: '2018-02-10T11:19:40.537Z',
-  created_by: 'Lana',
-}, {
-  score: 3,
-  date: '2018-02-20T11:19:40.537Z',
-  created_by: 'Lana',
-}];
+  'Data 2': [{
+    score: 1,
+    date: '2018-01-20T13:07:15.038Z',
+    created_by: 'Tesla',
+  }, {
+    score: 2,
+    date: '2018-01-28T11:16:35.002Z',
+    created_by: 'Lana',
+  }, {
+    score: 4,
+    date: '2018-01-30T11:19:40.537Z',
+    created_by: 'Lana',
+  }, {
+    score: 2,
+    date: '2018-02-10T11:19:40.537Z',
+    created_by: 'Lana',
+  }, {
+    score: 3,
+    date: '2018-02-20T11:19:40.537Z',
+    created_by: 'Lana',
+  }],
+};
 
-const scoreData = [{
+const singleData = [{
   score: 85.71,
   date: '2018-01-20T13:07:15.038Z',
   created_by: 'Tesla',

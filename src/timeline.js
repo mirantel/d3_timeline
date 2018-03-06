@@ -9,12 +9,6 @@ function parseData(sourseData) {
         createdBy: item.created_by,
       });
     });
-    if (d.length === 1) {
-      d.unshift({
-        date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
-        score: config.yAxisValue[0],
-      });
-    }
     return d;
   }
 }
