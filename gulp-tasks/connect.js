@@ -13,6 +13,6 @@ gulp.task('connect', () => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(paths.html, ['html:copy']);
-  gulp.watch(paths.jsWatch, ['js:build']);
+  gulp.watch(paths.htmlSrc, ['html:copy']);
+  gulp.watch(paths.jsSrc, ['js:build']);
 });
