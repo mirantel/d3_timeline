@@ -324,37 +324,3 @@ class timeline {
       .remove();
   }
 }
-
-const chart1Wrapper = document.getElementById('chart1');
-const initialData = eval(d3.select('#select').property('value'));
-const chart1 = new timeline(chart1Wrapper, {
-  data: initialData,
-  tooltipContent: d =>
-    `<b>Scrore: </b>${d.score}%<br>
-     <b>Date: </b>${d.date}<br>
-     <b>Scored by: </b>${d.createdBy}`,
-  showArea: true,
-  yAxisValue: [1, 4],
-  yAxisTicksNum: 4,
-  yAxisTickFormat: '',
-});
-
-d3.select('#select')
-  .on('change', function() {
-    const newData = eval(d3.select(this).property('value'));
-    chart1.update(newData);
-});
-
-
-const chart2Wrapper = document.getElementById('chart2');
-const chart2 = new timeline(chart2Wrapper, {
-  data: scoreData,
-  tooltipContent: d =>
-    `<b>Scrore: </b>${d.score}%<br>
-     <b>Date: </b>${d.date}<br>
-     <b>Scored by: </b>${d.createdBy}`,
-  showArea: true,
-  yAxisValue: [0, 100],
-  yAxisTicksNum: 10,
-  yAxisTickFormat: '%',
-});

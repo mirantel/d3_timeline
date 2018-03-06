@@ -17,6 +17,7 @@
     "gulp-babel": "^7.0.1",
     "gulp-concat": "^2.6.0",
     "gulp-connect": "^5.5.0",
+    "gulp-uglify": "^3.0.0",
     "open": "0.0.5",
     "path": "^0.12.7",
     "require-dir": "^1.0.0",
@@ -29,7 +30,8 @@
   "author": "Svitalana Pylypenko",
   "license": "MIT",
   "dependencies": {
-    "eslint": "^4.18.1"
+    "eslint": "^4.18.1",
+    "glob": "^7.1.2"
   },
   "bugs": {
     "url": "https://github.com/npm/npm/issues"
