@@ -16,8 +16,17 @@ function parseData(sourseData) {
 class timeline {
   constructor(chartWrapper, config) {
     this.config = config;
+
     parseData.bind(this)();
     const data = parseData(config.data);
+    if (data.length === 1) {
+      data.unshift({
+        date: new Date(data[0].date.getFullYear(), data[0].date.getMonth(), data[0].date.getDate() - 1),
+        score: config.yAxisValue[0],
+        createdBy: 'Default initial score'
+      });
+    }
+
     this.svg = d3.select(chartWrapper).append('svg')
     const svg = this.svg;
     this.wrapperWidth = chartWrapper.clientWidth;
