@@ -120,7 +120,7 @@
   <script>
     const chart1Wrapper = document.getElementById('chart1');
     const initialData = d3.select('#select').property('value');
-    const chart1 = new timeline(chart1Wrapper, {
+    const chart1 = new Timeline(chart1Wrapper, {
       data: multipleData[initialData],
       tooltipContent: d =>
         `<b>Scrore: </b>${d.score}%<br>
@@ -139,7 +139,7 @@
     });
 
     const chart2Wrapper = document.getElementById('chart2');
-    const chart2 = new timeline(chart2Wrapper, {
+    const chart2 = new Timeline(chart2Wrapper, {
       data: singleData,
       tooltipContent: d =>
         `<b>Scrore: </b>${d.score}%<br>
