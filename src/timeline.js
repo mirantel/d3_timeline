@@ -16,6 +16,7 @@ function parseData(sourseData) {
 class timeline {
   constructor(chartWrapper, config) {
     this.config = config;
+    this.chartWrapper = chartWrapper;
 
     parseData.bind(this)();
     const data = parseData(config.data);
@@ -275,6 +276,7 @@ class timeline {
     const updatedData = parseData(data);
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
+    const tooltip = d3.select(this.chartWrapper).select('.d3-tooltip');
 
     this.x.domain(d3.extent(updatedData, d => d.date));
     this.y.domain(this.config.yAxisValue);
