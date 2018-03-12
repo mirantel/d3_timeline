@@ -1,25 +1,9 @@
-function parseData(sourseData) {
-  if (sourseData) {
-    const d = [];
-    const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
-    sourseData.forEach((item) => {
-      return d.push({
-        date: parseDate(item.date),
-        score: item.score,
-        createdBy: item.created_by,
-      });
-    });
-    return d;
-  }
-}
-
 class Timeline {
   constructor(chartWrapper, config) {
     this.config = config;
     this.chartWrapper = chartWrapper;
 
-    parseData.bind(this)();
-    const data = parseData(config.data);
+    const data = this.parseData(config.data);
     if (data.length === 1) {
       data.unshift({
         date: new Date(data[0].date.getFullYear(), data[0].date.getMonth(), data[0].date.getDate() - 1),
@@ -29,116 +13,107 @@ class Timeline {
     }
 
     this.svg = d3.select(chartWrapper).append('svg')
-    const svg = this.svg;
     this.wrapperWidth = chartWrapper.clientWidth;
     this.wrapperHeight = chartWrapper.clientHeight;
 
-    svg
+    this.svg
       .attr('width', this.wrapperWidth)
       .attr('height', this.wrapperHeight);
 
-    const tooltip = d3.select(chartWrapper).append('div')
-      .attr('class', 'd3-tooltip')
-      .style('opacity', 0);
-
     this.dotSize = 4;
     this.dotPlaceholder = 6;
-    const dotPlaceholder = this.dotPlaceholder;
-    let timelineHeight = 75;
+    const timelinePlaceholder = 75;
 
     this.chartMargin = {
       top: 8,
       right: 20,
-      bottom: timelineHeight + 35,
+      bottom: timelinePlaceholder + 35,
       left: 40,
     };
-    const chartMargin = this.chartMargin;
     this.timelineMargin = {
-      top: (this.wrapperHeight - timelineHeight),
+      top: (this.wrapperHeight - timelinePlaceholder),
       right: 20,
       bottom: 30,
       left: 40,
     };
-    const timelineMargin = this.timelineMargin;
-    timelineHeight = timelineHeight - timelineMargin.bottom;
-    this.width = this.wrapperWidth - chartMargin.left - chartMargin.right;
-    const width = this.width;
-    const graphWidth = width - dotPlaceholder;
-    const chartHeight = this.wrapperHeight - chartMargin.top - chartMargin.bottom;
+
+    this.width = this.wrapperWidth - this.chartMargin.left - this.chartMargin.right;
+    this.graphWidth = this.width - this.dotPlaceholder;
+    this.chartHeight = this.wrapperHeight - this.chartMargin.top - this.chartMargin.bottom;
+    this.timelineHeight = timelinePlaceholder - this.timelineMargin.bottom;
 
     // Set the ranges
-    this.x = d3.scaleTime().range([dotPlaceholder, graphWidth]);
+    this.x = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
+    this.x2 = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
+    this.y = d3.scaleLinear().range([this.chartHeight, 0]);
+    this.y2 = d3.scaleLinear().range([this.timelineHeight, 0]);
     const x = this.x;
-    this.x2 = d3.scaleTime().range([dotPlaceholder, graphWidth]);
     const x2 = this.x2;
-    this.y = d3.scaleLinear().range([chartHeight, 0]);
     const y = this.y;
-    this.y2 = d3.scaleLinear().range([timelineHeight, 0]);
     const y2 = this.y2;
 
     // Define the axes
     this.xAxis = d3.axisBottom(x)
-      .tickSize(-chartHeight)
+      .tickSize(-this.chartHeight)
       .tickSizeOuter(0)
       .tickPadding(10);
-    const xAxis = this.xAxis;
     this.xAxis2 = d3.axisBottom(x2);
-    const xAxis2 = this.xAxis2;
-    const yAxis = d3.axisLeft(y)
-      .tickSize(-width)
+    this.yAxis = d3.axisLeft(y)
+      .tickSize(-this.width)
       .ticks(config.yAxisTicksNum)
       .tickFormat(d => d + config.yAxisTickFormat);
 
     // Define the brush
     this.brush = d3.brushX()
-      .extent([[dotPlaceholder, 0], [graphWidth, timelineHeight]])
-      .on('brush end', brushed);
-    const brush = this.brush;
+      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.timelineHeight]])
+      .on('brush end', this.brushed.bind(this));
 
     // Define the zoom
-    const zoom = d3.zoom()
+    this.zoom = d3.zoom()
       .scaleExtent([1, data.length * 12])
-      .translateExtent([[dotPlaceholder, 0], [graphWidth, this.hartHeight]])
-      .extent([[dotPlaceholder, 0], [graphWidth, this.hartHeight]])
-      .on('zoom', zoomed);
+      .translateExtent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
+      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
+      .on('zoom', this.zoomed.bind(this));
 
     this.chartArea = d3.area()
       .curve(d3.curveLinear)
       .x(d => x(d.date))
-      .y0(chartHeight)
+      .y0(this.chartHeight)
       .y1(d => y(d.score));
-    const chartArea = this.chartArea;
 
     this.timelineArea = d3.area()
       .curve(d3.curveLinear)
       .x(d => x2(d.date))
-      .y0(timelineHeight)
+      .y0(this.timelineHeight)
       .y1(d => y2(d.score));
 
     this.chartLine = d3.line()
       .x(d => x(d.date))
       .y(d => y(d.score));
-    const chartLine = this.chartLine;
 
     this.timelineLine = d3.line()
       .x(d => x2(d.date))
       .y(d => y2(d.score));
 
     this.clipId = `clip-${Math.floor(Math.random() * 100000)}`;
-    svg.append('defs').append('clipPath')
+    this.svg.append('defs').append('clipPath')
       .attr('id', this.clipId)
       .append('rect')
-      .attr('width', width)
-      .attr('height', chartHeight + (dotPlaceholder * 2))
-      .attr('transform', `translate( 0, -${dotPlaceholder} )`);
+      .attr('width', this.width)
+      .attr('height', this.chartHeight + (this.dotPlaceholder * 2))
+      .attr('transform', `translate( 0, -${this.dotPlaceholder} )`);
 
-    const focus = svg.append('g')
+    const focus = this.svg.append('g')
       .attr('class', 'focus')
-      .attr('transform', `translate(${chartMargin.left}, ${chartMargin.top})`);
+      .attr('transform', `translate(${this.chartMargin.left}, ${this.chartMargin.top})`);
 
-    const context = svg.append('g')
+    const context = this.svg.append('g')
       .attr('class', 'context')
-      .attr('transform', `translate(${timelineMargin.left}, ${timelineMargin.top})`);
+      .attr('transform', `translate(${this.timelineMargin.left}, ${this.timelineMargin.top})`);
+
+    const tooltip = d3.select(chartWrapper).append('div')
+      .attr('class', 'd3-tooltip')
+      .style('opacity', 0);
 
     // Scale the range of the data
     x.domain(d3.extent(data, d => d.date));
@@ -151,7 +126,7 @@ class Timeline {
         .datum(data)
         .attr('class', 'area')
         .attr('clip-path', `url(#${this.clipId})`)
-        .attr('d', chartArea);
+        .attr('d', this.chartArea);
     }
 
     focus.append('path')
@@ -159,22 +134,22 @@ class Timeline {
       .attr('fill', 'none')
       .attr('class', 'line')
       .attr('clip-path', `url(#${this.clipId})`)
-      .attr('d', chartLine);
+      .attr('d', this.chartLine);
 
     focus.append('g')
       .attr('class', 'axis axis--x')
-      .attr('transform', `translate(0, ${chartHeight})`)
-      .call(xAxis);
+      .attr('transform', `translate(0, ${this.chartHeight})`)
+      .call(this.xAxis);
 
     focus.append('g')
       .attr('class', 'axis axis--y')
-      .call(yAxis);
+      .call(this.yAxis);
 
     focus.append('rect')
       .attr('class', 'zoom')
-      .attr('width', width)
-      .attr('height', chartHeight)
-      .call(zoom);
+      .attr('width', this.width)
+      .attr('height', this.chartHeight)
+      .call(this.zoom);
 
     d3.select(chartWrapper)
       .style('position', 'relative');
@@ -211,38 +186,56 @@ class Timeline {
 
     context.append('g')
       .attr('class', 'axis axis--x')
-      .attr('transform', `translate(0, ${timelineHeight})`)
-      .call(xAxis2);
+      .attr('transform', `translate(0, ${this.timelineHeight})`)
+      .call(this.xAxis2);
 
     context.append('g')
       .attr('class', 'brush')
-      .call(brush)
-      .call(brush.move, x.range());
+      .call(this.brush)
+      .call(this.brush.move, x.range());
+  }
 
-    function brushed() {
-      if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
-      const s = d3.event.selection || x2.range();
-      const ratio = (graphWidth - 6) / (s[1] - s[0]);
-      x.domain(s.map(x2.invert, x2));
-      focus.select('.area').attr('d', chartArea);
-      focus.select('.axis--x').call(xAxis);
-      focus.select('.line').attr('d', chartLine);
-      focus.selectAll('.dot').attr('cx', d => x(d.date));
-      svg.select('.zoom').call(zoom.transform, d3.zoomIdentity
-        .scale(ratio)
-        .translate(-s[0] + (dotPlaceholder / ratio), 0));
+  parseData(sourseData) {
+    if (sourseData) {
+      const d = [];
+      const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
+      sourseData.forEach((item) => {
+        return d.push({
+          date: parseDate(item.date),
+          score: item.score,
+          createdBy: item.created_by,
+        });
+      });
+      return d;
     }
+  }
 
-    function zoomed() {
-      if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') return; // ignore zoom-by-brush
-      const t = d3.event.transform;
-      x.domain(t.rescaleX(x2).domain());
-      focus.select('.area').attr('d', chartArea);
-      focus.select('.axis--x').call(xAxis);
-      focus.select('.line').attr('d', chartLine);
-      focus.selectAll('.dot').attr('cx', d => x(d.date));
-      context.select('.brush').call(brush.move, x.range().map(t.invertX, t));
-    }
+  zoomed() {
+    if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') return; // ignore zoom-by-brush
+    const t = d3.event.transform;
+    this.x.domain(t.rescaleX(this.x2).domain());
+    const focus = this.svg.select('.focus')
+    const context = this.svg.select('.context')
+    focus.select('.area').attr('d', this.chartArea);
+    focus.select('.axis--x').call(this.xAxis);
+    focus.select('.line').attr('d', this.chartLine);
+    focus.selectAll('.dot').attr('cx', d => this.x(d.date));
+    context.select('.brush').call(this.brush.move, this.x.range().map(t.invertX, t));
+  }
+
+  brushed() {
+    if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
+    const s = d3.event.selection || this.x2.range();
+    const ratio = (this.graphWidth - 6) / (s[1] - s[0]);
+    const focus = this.svg.select('.focus')
+    this.x.domain(s.map(this.x2.invert, this.x2));
+    focus.select('.area').attr('d', this.chartArea);
+    focus.select('.axis--x').call(this.xAxis);
+    focus.select('.line').attr('d', this.chartLine);
+    focus.selectAll('.dot').attr('cx', d => this.x(d.date));
+    this.svg.select('.zoom').call(this.zoom.transform, d3.zoomIdentity
+      .scale(ratio)
+      .translate(-s[0] + (this.dotPlaceholder / ratio), 0));
   }
 
   showTooltip(d) {
@@ -280,7 +273,7 @@ class Timeline {
   }
 
   update(data) {
-    const updatedData = parseData(data);
+    const updatedData = this.parseData(data);
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
 
