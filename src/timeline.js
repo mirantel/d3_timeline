@@ -195,6 +195,16 @@ class Timeline {
       .call(this.brush.move, x.range());
   }
 
+  render() {
+    // console.log('Render!');
+  }
+
+  resize() {
+    // console.log('Resize!');
+
+    render();
+  }
+
   parseData(sourseData) {
     if (sourseData) {
       const d = [];
@@ -329,3 +339,6 @@ class Timeline {
       .remove();
   }
 }
+
+// d3.select(window).on('resize', resize);
+// render();
