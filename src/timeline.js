@@ -194,10 +194,6 @@ class Timeline {
   }
 
   render() {
-    console.log('Render ');
-  }
-
-  resize() {
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
     const data = this.data;
@@ -273,6 +269,14 @@ class Timeline {
     y.domain(this.config.yAxisValue);
     x2.domain(x.domain());
     y2.domain(y.domain());
+  }
+
+  resize() {
+    const focus = this.svg.select('.focus');
+    const context = this.svg.select('.context');
+    const data = this.data;
+
+    this.render();
 
     focus.select('.axis--x').call(this.xAxis);
     focus.select('.axis--y').call(this.yAxis);
@@ -285,7 +289,7 @@ class Timeline {
     context.select('.area').attr('d', this.timelineArea);
     context.select('.line').attr('d', this.timelineLine);
     context.select('.brush').call(this.brush)
-      .call(this.brush.move, x.range());
+      .call(this.brush.move, this.x.range());
   }
 
   parseData(sourseData) {
