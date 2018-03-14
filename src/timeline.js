@@ -14,12 +14,7 @@ class Timeline {
     }
 
     this.svg = d3.select(this.chartWrapper).append('svg')
-    this.wrapperWidth = this.chartWrapper.clientWidth;
     this.wrapperHeight = this.chartWrapper.clientHeight;
-
-    this.svg
-      .attr('width', this.wrapperWidth)
-      .attr('height', this.wrapperHeight);
 
     this.dotSize = 4;
     this.dotPlaceholder = 6;
@@ -38,63 +33,14 @@ class Timeline {
       left: 40,
     };
 
-    this.width = this.wrapperWidth - this.chartMargin.left - this.chartMargin.right;
-    this.graphWidth = this.width - this.dotPlaceholder;
     this.chartHeight = this.wrapperHeight - this.chartMargin.top - this.chartMargin.bottom;
     this.timelineHeight = timelinePlaceholder - this.timelineMargin.bottom;
 
-    // Set the ranges
-    this.x = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
-    this.x2 = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
-    this.y = d3.scaleLinear().range([this.chartHeight, 0]);
-    this.y2 = d3.scaleLinear().range([this.timelineHeight, 0]);
+    this.render();
     const x = this.x;
     const x2 = this.x2;
     const y = this.y;
     const y2 = this.y2;
-
-    // Define the axes
-    this.xAxis = d3.axisBottom(x)
-      .tickSize(-this.chartHeight)
-      .tickSizeOuter(0)
-      .tickPadding(10);
-    this.xAxis2 = d3.axisBottom(x2);
-    this.yAxis = d3.axisLeft(y)
-      .tickSize(-this.width)
-      .ticks(config.yAxisTicksNum)
-      .tickFormat(d => d + config.yAxisTickFormat);
-
-    // Define the brush
-    this.brush = d3.brushX()
-      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.timelineHeight]])
-      .on('brush end', this.brushed.bind(this));
-
-    // Define the zoom
-    this.zoom = d3.zoom()
-      .scaleExtent([1, data.length * 12])
-      .translateExtent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
-      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
-      .on('zoom', this.zoomed.bind(this));
-
-    this.chartArea = d3.area()
-      .curve(d3.curveLinear)
-      .x(d => x(d.date))
-      .y0(this.chartHeight)
-      .y1(d => y(d.score));
-
-    this.timelineArea = d3.area()
-      .curve(d3.curveLinear)
-      .x(d => x2(d.date))
-      .y0(this.timelineHeight)
-      .y1(d => y2(d.score));
-
-    this.chartLine = d3.line()
-      .x(d => x(d.date))
-      .y(d => y(d.score));
-
-    this.timelineLine = d3.line()
-      .x(d => x2(d.date))
-      .y(d => y2(d.score));
 
     this.clipId = `clip-${Math.floor(Math.random() * 100000)}`;
     this.svg.append('defs').append('clipPath')
@@ -199,7 +145,6 @@ class Timeline {
     const data = this.data;
 
     this.wrapperWidth = this.chartWrapper.clientWidth;
-    this.wrapperHeight = this.chartWrapper.clientHeight;
 
     this.svg
       .attr('width', this.wrapperWidth)
