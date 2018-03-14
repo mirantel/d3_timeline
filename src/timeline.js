@@ -3,7 +3,8 @@ class Timeline {
     this.config = config;
     this.chartWrapper = chartWrapper;
 
-    const data = this.parseData(config.data);
+    this.data = this.parseData(config.data);
+    const data = this.data;
     if (data.length === 1) {
       data.unshift({
         date: new Date(data[0].date.getFullYear(), data[0].date.getMonth(), data[0].date.getDate() - 1),
@@ -12,9 +13,9 @@ class Timeline {
       });
     }
 
-    this.svg = d3.select(chartWrapper).append('svg')
-    this.wrapperWidth = chartWrapper.clientWidth;
-    this.wrapperHeight = chartWrapper.clientHeight;
+    this.svg = d3.select(this.chartWrapper).append('svg')
+    this.wrapperWidth = this.chartWrapper.clientWidth;
+    this.wrapperHeight = this.chartWrapper.clientHeight;
 
     this.svg
       .attr('width', this.wrapperWidth)
@@ -99,6 +100,7 @@ class Timeline {
     this.svg.append('defs').append('clipPath')
       .attr('id', this.clipId)
       .append('rect')
+      .attr('class', 'clipRect')
       .attr('width', this.width)
       .attr('height', this.chartHeight + (this.dotPlaceholder * 2))
       .attr('transform', `translate( 0, -${this.dotPlaceholder} )`);
@@ -111,7 +113,7 @@ class Timeline {
       .attr('class', 'context')
       .attr('transform', `translate(${this.timelineMargin.left}, ${this.timelineMargin.top})`);
 
-    const tooltip = d3.select(chartWrapper).append('div')
+    const tooltip = d3.select(this.chartWrapper).append('div')
       .attr('class', 'd3-tooltip')
       .style('opacity', 0);
 
@@ -121,13 +123,11 @@ class Timeline {
     x2.domain(x.domain());
     y2.domain(y.domain());
 
-    if (config.showArea) {
-      focus.append('path')
-        .datum(data)
-        .attr('class', 'area')
-        .attr('clip-path', `url(#${this.clipId})`)
-        .attr('d', this.chartArea);
-    }
+    focus.append('path')
+      .datum(data)
+      .attr('class', 'area')
+      .attr('clip-path', `url(#${this.clipId})`)
+      .attr('d', this.chartArea);
 
     focus.append('path')
       .datum(data)
@@ -151,7 +151,7 @@ class Timeline {
       .attr('height', this.chartHeight)
       .call(this.zoom);
 
-    d3.select(chartWrapper)
+    d3.select(this.chartWrapper)
       .style('position', 'relative');
 
     // Add the scatterplot
@@ -169,13 +169,11 @@ class Timeline {
       .on('mouseover', this.showTooltip.bind(this))
       .on('mouseout', this.hideTooltip.bind(this));
 
-    if (config.showArea) {
-      context.append('path')
-        .datum(data)
-        .attr('class', 'area')
-        .attr('clip-path', `url(#${this.clipId})`)
-        .attr('d', this.timelineArea);
-    }
+    context.append('path')
+      .datum(data)
+      .attr('class', 'area')
+      .attr('clip-path', `url(#${this.clipId})`)
+      .attr('d', this.timelineArea);
 
     context.append('path')
       .datum(data)
@@ -196,13 +194,98 @@ class Timeline {
   }
 
   render() {
-    // console.log('Render!');
+    console.log('Render ');
   }
 
   resize() {
-    // console.log('Resize!');
+    const focus = this.svg.select('.focus');
+    const context = this.svg.select('.context');
+    const data = this.data;
 
-    render();
+    this.wrapperWidth = this.chartWrapper.clientWidth;
+    this.wrapperHeight = this.chartWrapper.clientHeight;
+
+    this.svg
+      .attr('width', this.wrapperWidth)
+      .attr('height', this.wrapperHeight);
+
+    this.width = this.wrapperWidth - this.chartMargin.left - this.chartMargin.right;
+    this.graphWidth = this.width - this.dotPlaceholder;
+
+    // Set the ranges
+    this.x = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
+    this.x2 = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
+    this.y = d3.scaleLinear().range([this.chartHeight, 0]);
+    this.y2 = d3.scaleLinear().range([this.timelineHeight, 0]);
+    const x = this.x;
+    const x2 = this.x2;
+    const y = this.y;
+    const y2 = this.y2;
+
+    // Define the axes
+    this.xAxis = d3.axisBottom(x)
+      .tickSize(-this.chartHeight)
+      .tickSizeOuter(0)
+      .tickPadding(10);
+    this.xAxis2 = d3.axisBottom(x2);
+    this.yAxis = d3.axisLeft(y)
+      .tickSize(-this.width)
+      .ticks(this.config.yAxisTicksNum)
+      .tickFormat(d => d + this.config.yAxisTickFormat);
+
+    // Define the brush
+    this.brush = d3.brushX()
+      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.timelineHeight]])
+      .on('brush end', this.brushed.bind(this));
+
+    // Define the zoom
+    this.zoom = d3.zoom()
+      .scaleExtent([1, data.length * 12])
+      .translateExtent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
+      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
+      .on('zoom', this.zoomed.bind(this));
+
+    this.chartArea = d3.area()
+      .curve(d3.curveLinear)
+      .x(d => x(d.date))
+      .y0(this.chartHeight)
+      .y1(d => y(d.score));
+
+    this.timelineArea = d3.area()
+      .curve(d3.curveLinear)
+      .x(d => x2(d.date))
+      .y0(this.timelineHeight)
+      .y1(d => y2(d.score));
+
+    this.chartLine = d3.line()
+      .x(d => x(d.date))
+      .y(d => y(d.score));
+
+    this.timelineLine = d3.line()
+      .x(d => x2(d.date))
+      .y(d => y2(d.score));
+
+    this.svg.select('.clipRect')
+      .attr('width', this.width);
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, d => d.date));
+    y.domain(this.config.yAxisValue);
+    x2.domain(x.domain());
+    y2.domain(y.domain());
+
+    focus.select('.axis--x').call(this.xAxis);
+    focus.select('.axis--y').call(this.yAxis);
+    focus.select('.area').attr('d', this.chartArea);
+    focus.select('.line').attr('d', this.chartLine);
+    focus.selectAll('.dot').attr('cx', d => this.x(d.date));
+    focus.select('.zoom').attr('width', this.width);
+
+    context.select('.axis--x').call(this.xAxis2);
+    context.select('.area').attr('d', this.timelineArea);
+    context.select('.line').attr('d', this.timelineLine);
+    context.select('.brush').call(this.brush)
+      .call(this.brush.move, x.range());
   }
 
   parseData(sourseData) {
@@ -339,6 +422,3 @@ class Timeline {
       .remove();
   }
 }
-
-// d3.select(window).on('resize', resize);
-// render();
