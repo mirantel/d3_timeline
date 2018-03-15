@@ -4,39 +4,20 @@ class Timeline {
     this.chartWrapper = chartWrapper;
 
     this.data = this.parseData(config.data);
-    const data = this.data;
-    if (data.length === 1) {
-      data.unshift({
-        date: new Date(data[0].date.getFullYear(), data[0].date.getMonth(), data[0].date.getDate() - 1),
-        score: config.yAxisValue[0],
-        createdBy: 'Default initial score'
-      });
-    }
 
     this.svg = d3.select(this.chartWrapper).append('svg')
-    this.wrapperHeight = this.chartWrapper.clientHeight;
 
     this.dotSize = 4;
     this.dotPlaceholder = 6;
-    const timelinePlaceholder = 75;
-
-    this.chartMargin = {
-      top: 8,
-      right: 20,
-      bottom: timelinePlaceholder + 35,
-      left: 40,
-    };
-    this.timelineMargin = {
-      top: (this.wrapperHeight - timelinePlaceholder),
-      right: 20,
-      bottom: 30,
-      left: 40,
-    };
-
-    this.chartHeight = this.wrapperHeight - this.chartMargin.top - this.chartMargin.bottom;
-    this.timelineHeight = timelinePlaceholder - this.timelineMargin.bottom;
+    this.timelinePlaceholder = 75;
+    this.marginTop = 8;
+    this.marginRight = 20;
+    this.marginLeft = 40;
+    this.marginBottom = 30;
+    this.spaceAfterMainChart = 35;
 
     this.render();
+
     const x = this.x;
     const x2 = this.x2;
     const y = this.y;
@@ -64,19 +45,19 @@ class Timeline {
       .style('opacity', 0);
 
     // Scale the range of the data
-    x.domain(d3.extent(data, d => d.date));
+    x.domain(d3.extent(this.data, d => d.date));
     y.domain(config.yAxisValue);
     x2.domain(x.domain());
     y2.domain(y.domain());
 
     focus.append('path')
-      .datum(data)
+      .datum(this.data)
       .attr('class', 'area')
       .attr('clip-path', `url(#${this.clipId})`)
       .attr('d', this.chartArea);
 
     focus.append('path')
-      .datum(data)
+      .datum(this.data)
       .attr('fill', 'none')
       .attr('class', 'line')
       .attr('clip-path', `url(#${this.clipId})`)
@@ -105,7 +86,7 @@ class Timeline {
       .attr('class', 'dots')
       .attr('clip-path', `url(#${this.clipId})`)
       .selectAll('dot')
-      .data(data)
+      .data(this.data)
       .enter()
       .append('circle')
       .attr('r', this.dotSize)
@@ -116,13 +97,13 @@ class Timeline {
       .on('mouseout', this.hideTooltip.bind(this));
 
     context.append('path')
-      .datum(data)
+      .datum(this.data)
       .attr('class', 'area')
       .attr('clip-path', `url(#${this.clipId})`)
       .attr('d', this.timelineArea);
 
     context.append('path')
-      .datum(data)
+      .datum(this.data)
       .attr('fill', 'none')
       .attr('class', 'line')
       .attr('clip-path', `url(#${this.clipId})`)
@@ -145,6 +126,20 @@ class Timeline {
     const data = this.data;
 
     this.wrapperWidth = this.chartWrapper.clientWidth;
+    this.wrapperHeight = this.chartWrapper.clientHeight;
+
+    this.chartMargin = {
+      top: this.marginTop,
+      right: this.marginRight,
+      bottom: this.timelinePlaceholder + this.spaceAfterMainChart,
+      left: this.marginLeft,
+    };
+    this.timelineMargin = {
+      top: (this.wrapperHeight - this.timelinePlaceholder),
+      right: this.marginRight,
+      bottom: this.marginBottom,
+      left: this.marginLeft,
+    };
 
     this.svg
       .attr('width', this.wrapperWidth)
@@ -152,6 +147,8 @@ class Timeline {
 
     this.width = this.wrapperWidth - this.chartMargin.left - this.chartMargin.right;
     this.graphWidth = this.width - this.dotPlaceholder;
+    this.chartHeight = this.wrapperHeight - this.chartMargin.top - this.chartMargin.bottom;
+    this.timelineHeight = this.timelinePlaceholder - this.timelineMargin.bottom;
 
     // Set the ranges
     this.x = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
@@ -248,6 +245,13 @@ class Timeline {
           createdBy: item.created_by,
         });
       });
+      if (d.length === 1) {
+        d.unshift({
+          date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
+          score: this.config.yAxisValue[0],
+          createdBy: 'Default initial score'
+        });
+      }
       return d;
     }
   }
