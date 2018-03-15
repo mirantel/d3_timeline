@@ -106,15 +106,74 @@
     #chart2 {
       height: 400px;
     }
+
+    .tabs__caption {
+    display: flex;
+
+    padding: 0;
+    margin: 0;
+
+    list-style: none;
+
+    border-bottom: 3px solid $brand-gray3;
+  }
+
+  .tabs__item {
+    padding: 16px 20px;
+    margin: 0 0 -3px;
+
+    font-size: 1.6rem;
+    line-height: 1.4;
+
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+
+    &:hover {
+      border-bottom-color: $brand-cta;
+    }
+  }
+
+  .tabs__item--active,
+  .tabs__item.is-active {
+    font-weight: 700;
+
+    border-bottom-color: $brand-cta;
+  }
+
+  .tabs__content {
+    display: none;
+    padding: 15px 0;
+  }
+
+  .tabs__content--active,
+  .tabs__content.is-active {
+    display: block;
+  }
+
 </style>
 </head>
 <body>
-  <select name="" id="select">
-    <option value="Data 1">Data 1</option>
-    <option value="Data 2">Data 2</option>
-  </select>
-  <div id="chart1"></div>
-  <div id="chart2"></div>
+  <div class="tabs">
+    <ul class="tabs__caption">
+      <li class="tabs__item is-active">tab 1</li>
+      <li class="tabs__item">tab 2</li>
+    </ul>
+    <div id="tabs__content-wrap" class="tabs__content-wrap">
+      <div class="tabs__content is-active">
+        <select name="" id="select">
+          <option value="Data 1">Data 1</option>
+          <option value="Data 2">Data 2</option>
+        </select>
+        <div id="chart1"></div>
+      </div>
+      <div class="tabs__content">
+        <div id="chart2"></div>
+      </div>
+      text
+    </div>
+  </div>
+
+
   <script src="data.js"></script>
   <script src="timeline.js"></script>
   <script>
@@ -128,7 +187,7 @@
          <b>Scored by: </b>${d.createdBy}`,
       yAxisValue: [1, 4],
       yAxisTicksNum: 4,
-      yAxisTickFormat: '',
+      tabsWrapper: '#tabs__content-wrap',
     });
 
     d3.select('#select')
@@ -139,7 +198,9 @@
 
     window.addEventListener('resize', function () {
       chart1.resize();
+      chart2.resize();
     }, false);
+
     const chart2Wrapper = document.getElementById('chart2');
     const chart2 = new Timeline(chart2Wrapper, {
       data: singleData,
@@ -150,6 +211,7 @@
       yAxisValue: [0, 100],
       yAxisTicksNum: 10,
       yAxisTickFormat: '%',
+      tabsWrapper: '#tabs__content-wrap',
     });
   </script>
 </body>

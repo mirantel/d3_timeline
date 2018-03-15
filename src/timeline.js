@@ -1,7 +1,9 @@
 class Timeline {
-  constructor(chartWrapper, config) {
+  constructor(chartWrapper, config, b) {
     this.config = config;
     this.chartWrapper = chartWrapper;
+
+    this.config.yAxisTickFormat = typeof this.config.yAxisTickFormat !== 'undefined' ?  this.config.yAxisTickFormat : '';
 
     this.data = this.parseData(config.data);
 
@@ -125,8 +127,16 @@ class Timeline {
     const context = this.svg.select('.context');
     const data = this.data;
 
-    this.wrapperWidth = this.chartWrapper.clientWidth;
-    this.wrapperHeight = this.chartWrapper.clientHeight;
+    if (this.config.tabsWrapper) {
+      const tabsWrap = d3.select(this.config.tabsWrapper).node();
+
+      this.wrapperWidth = tabsWrap.getBoundingClientRect().width;
+      this.wrapperHeight = tabsWrap.getBoundingClientRect().height;
+      console.log(this.wrapperHeight);
+    } else {
+      this.wrapperWidth = this.chartWrapper.clientWidth;
+      this.wrapperHeight = this.chartWrapper.clientHeight;
+    }
 
     this.chartMargin = {
       top: this.marginTop,
@@ -216,7 +226,6 @@ class Timeline {
   resize() {
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
-    const data = this.data;
 
     this.render();
 
