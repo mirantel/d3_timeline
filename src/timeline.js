@@ -128,15 +128,12 @@ class Timeline {
     const data = this.data;
 
     if (this.config.tabsWrapper) {
-      const tabsWrap = d3.select(this.config.tabsWrapper).node();
-
-      this.wrapperWidth = tabsWrap.getBoundingClientRect().width;
-      this.wrapperHeight = tabsWrap.getBoundingClientRect().height;
-      console.log(this.wrapperHeight);
+      this.wrapperWidth = d3.select(this.config.tabsWrapper).node()
+        .getBoundingClientRect().width;
     } else {
       this.wrapperWidth = this.chartWrapper.clientWidth;
-      this.wrapperHeight = this.chartWrapper.clientHeight;
     }
+    this.wrapperHeight = this.config.height;
 
     this.chartMargin = {
       top: this.marginTop,

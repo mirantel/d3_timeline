@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Line Chart</title>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="jquery-3.3.1.slim.min.js"></script>
   <style>
     *, *:before, *:after {
       -webkit-box-sizing: border-box;
@@ -99,14 +100,6 @@
       border-color: transparent transparent transparent rgba(0, 0, 0, 0.8);
     }
 
-    #chart1 {
-      height: 300px;
-    }
-
-    #chart2 {
-      height: 400px;
-    }
-
     .tabs__caption {
     display: flex;
 
@@ -169,7 +162,6 @@
       <div class="tabs__content">
         <div id="chart2"></div>
       </div>
-      text
     </div>
   </div>
 
@@ -177,6 +169,16 @@
   <script src="data.js"></script>
   <script src="timeline.js"></script>
   <script>
+
+    $('ul.tabs__caption').on('click', 'li:not(.is-active)', function() {
+    $(this)
+      .addClass('is-active')
+      .siblings().removeClass('is-active')
+      .closest('div.tabs').find('div.tabs__content')
+      .removeClass('is-active')
+      .eq($(this).index()).addClass('is-active');
+    });
+
     const chart1Wrapper = document.getElementById('chart1');
     const initialData = d3.select('#select').property('value');
     const chart1 = new Timeline(chart1Wrapper, {
@@ -188,6 +190,7 @@
       yAxisValue: [1, 4],
       yAxisTicksNum: 4,
       tabsWrapper: '#tabs__content-wrap',
+      height: 300,
     });
 
     d3.select('#select')
@@ -212,6 +215,7 @@
       yAxisTicksNum: 10,
       yAxisTickFormat: '%',
       tabsWrapper: '#tabs__content-wrap',
+      height: 400,
     });
   </script>
 </body>
