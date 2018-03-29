@@ -1,4 +1,22 @@
 // Graph Tests Data
+
+/**
+ * This format is hard to read and copypaste. We usually use this format:
+ * const data = {
+ *  arr_key: [
+ *    {
+ *      key: value,
+ *      key2: value2,
+ *    },
+ *    {
+ *      key: value,
+ *      key2: value2,
+ *    },
+ *    ...
+ *  ],
+ *  ...
+ * };
+ */
 const multipleData = {
   'Data 1': [{
     score: 2,

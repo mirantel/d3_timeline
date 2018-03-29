@@ -2,6 +2,9 @@ class Timeline {
   constructor(chartWrapper, config, b) {
     this.config = config;
     this.chartWrapper = chartWrapper;
+    // I'm not sure what is the purpose of this check below...
+    // If it is done to assign a default value of empty string, it can be done like this:
+    // this.config.yAxisTickFormat = this.config.yAxisTickFormat || '';
 
     this.config.yAxisTickFormat = typeof this.config.yAxisTickFormat !== 'undefined' ?  this.config.yAxisTickFormat : '';
 
@@ -25,7 +28,7 @@ class Timeline {
     const y = this.y;
     const y2 = this.y2;
 
-    this.clipId = `clip-${Math.floor(Math.random() * 100000)}`;
+    this.clipId = `clip-${Math.floor(Math.random() * 100000)}`; // this doesn't guarantee a uniques id. Is it ok?
     this.svg.append('defs').append('clipPath')
       .attr('id', this.clipId)
       .append('rect')
@@ -125,11 +128,13 @@ class Timeline {
   render() {
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
-    const data = this.data;
-
+    const data = this.data; // this is mutable, if it can be not mutable - it is better to create new array: const data = [...this.data];
     if (this.config.tabsWrapper) {
-      this.wrapperWidth = d3.select(this.config.tabsWrapper).node()
-        .getBoundingClientRect().width;
+      this.wrapperWidth = d3
+        .select(this.config.tabsWrapper)
+        .node()
+        .getBoundingClientRect()
+        .width;
     } else {
       this.wrapperWidth = this.chartWrapper.clientWidth;
     }
@@ -244,6 +249,7 @@ class Timeline {
     if (sourseData) {
       const d = [];
       const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
+      // Array.prototype.map seems more appropriate, see parseData2 below.
       sourseData.forEach((item) => {
         return d.push({
           date: parseDate(item.date),
@@ -251,6 +257,7 @@ class Timeline {
           createdBy: item.created_by,
         });
       });
+      // Is this correct? If we only have one object in our data - add default initial score to the beginning?
       if (d.length === 1) {
         d.unshift({
           date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
@@ -260,6 +267,24 @@ class Timeline {
       }
       return d;
     }
+  }
+  
+  parseData2(sourseData = []) {
+    const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
+    const parsedData = sourseData
+      .map(d => ({
+        ...d,
+        date: parseDate(d.date),
+        createdBy: d.created_by,
+      }));
+    if (parsedData.length === 1) {
+      parsedData.unshift({
+        date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
+        score: this.config.yAxisValue[0],
+        createdBy: 'Default initial score'
+      });
+    }
+    return parsedData;
   }
 
   zoomed() {
