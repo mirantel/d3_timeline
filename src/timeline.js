@@ -2,11 +2,7 @@ class Timeline {
   constructor(chartWrapper, config, b) {
     this.config = config;
     this.chartWrapper = chartWrapper;
-    // I'm not sure what is the purpose of this check below...
-    // If it is done to assign a default value of empty string, it can be done like this:
-    // this.config.yAxisTickFormat = this.config.yAxisTickFormat || '';
-
-    this.config.yAxisTickFormat = typeof this.config.yAxisTickFormat !== 'undefined' ?  this.config.yAxisTickFormat : '';
+    this.config.yAxisTickFormat = this.config.yAxisTickFormat || '';
 
     this.data = this.parseData(config.data);
 
@@ -128,7 +124,7 @@ class Timeline {
   render() {
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
-    const data = this.data; // this is mutable, if it can be not mutable - it is better to create new array: const data = [...this.data];
+    const data = [...this.data];
     if (this.config.tabsWrapper) {
       this.wrapperWidth = d3
         .select(this.config.tabsWrapper)
@@ -244,30 +240,6 @@ class Timeline {
     context.select('.brush').call(this.brush)
       .call(this.brush.move, this.x.range());
   }
-
-  // parseData(sourseData) {
-  //   if (sourseData) {
-  //     const d = [];
-  //     const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
-  //     // Array.prototype.map seems more appropriate, see parseData2 below.
-  //     sourseData.forEach((item) => {
-  //       return d.push({
-  //         date: parseDate(item.date),
-  //         score: item.score,
-  //         createdBy: item.created_by,
-  //       });
-  //     });
-  //     // Is this correct? If we only have one object in our data - add default initial score to the beginning?
-  //     if (d.length === 1) {
-  //       d.unshift({
-  //         date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
-  //         score: this.config.yAxisValue[0],
-  //         createdBy: 'Default initial score'
-  //       });
-  //     }
-  //     return d;
-  //   }
-  // }
 
   parseData(sourseData = []) {
     const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
