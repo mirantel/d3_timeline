@@ -24,7 +24,7 @@ class Timeline {
     const y = this.y;
     const y2 = this.y2;
 
-    this.clipId = `clip-${Math.floor(Math.random() * 100000)}`; // this doesn't guarantee a uniques id. Is it ok?
+    this.clipId = `clip-${this.chartWrapper.id}`; 
     this.svg.append('defs').append('clipPath')
       .attr('id', this.clipId)
       .append('rect')

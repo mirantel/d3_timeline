@@ -199,10 +199,7 @@
 
     d3.select('#select')
       .on('change', function() {
-        //not sure how d3 works, but change event itseld contains the info
-        // so if we can get event.target.value - we won't need to select the element each time
-        const newData = d3.select(this).property('value');
-        chart1.update(multipleData[newData]);
+        chart1.update(multipleData[event.target.value]);
     });
 
     window.addEventListener('resize', function () {
