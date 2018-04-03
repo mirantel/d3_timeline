@@ -9,7 +9,7 @@ gulp.task('js:build', () => {
   gulp.src([paths.jsSrc])
     .pipe(gulp.dest(paths.dest))
     .pipe(babel({
-      'presets': ['es2015']
+      'presets': ['env']
     }))
     .pipe(uglify())
     .pipe(rename({
