@@ -245,31 +245,31 @@ class Timeline {
       .call(this.brush.move, this.x.range());
   }
 
-  parseData(sourseData) {
-    if (sourseData) {
-      const d = [];
-      const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
-      // Array.prototype.map seems more appropriate, see parseData2 below.
-      sourseData.forEach((item) => {
-        return d.push({
-          date: parseDate(item.date),
-          score: item.score,
-          createdBy: item.created_by,
-        });
-      });
-      // Is this correct? If we only have one object in our data - add default initial score to the beginning?
-      if (d.length === 1) {
-        d.unshift({
-          date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
-          score: this.config.yAxisValue[0],
-          createdBy: 'Default initial score'
-        });
-      }
-      return d;
-    }
-  }
-  
-  parseData2(sourseData = []) {
+  // parseData(sourseData) {
+  //   if (sourseData) {
+  //     const d = [];
+  //     const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
+  //     // Array.prototype.map seems more appropriate, see parseData2 below.
+  //     sourseData.forEach((item) => {
+  //       return d.push({
+  //         date: parseDate(item.date),
+  //         score: item.score,
+  //         createdBy: item.created_by,
+  //       });
+  //     });
+  //     // Is this correct? If we only have one object in our data - add default initial score to the beginning?
+  //     if (d.length === 1) {
+  //       d.unshift({
+  //         date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
+  //         score: this.config.yAxisValue[0],
+  //         createdBy: 'Default initial score'
+  //       });
+  //     }
+  //     return d;
+  //   }
+  // }
+
+  parseData(sourseData = []) {
     const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ');
     const parsedData = sourseData
       .map(d => ({
