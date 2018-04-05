@@ -2,7 +2,7 @@
 
 const multipleData = {
   'Data 1': [
-      {
+    {
       score: 2,
       date: '2018-01-20T13:07:15.038Z',
       created_by: 'Tesla',
@@ -18,7 +18,8 @@ const multipleData = {
       created_by: 'Lana',
     }],
 
-    'Data 2': [{
+  'Data 2': [
+    {
       score: 1,
       date: '2018-01-20T13:07:15.038Z',
       created_by: 'Tesla',
@@ -42,7 +43,7 @@ const multipleData = {
       score: 3,
       date: '2018-02-20T11:19:40.537Z',
       created_by: 'Lana',
-    }
+    },
   ],
 };
 
@@ -121,5 +122,5 @@ const singleData = [
     score: 23.81,
     date: '2018-02-15T16:16:54.905Z',
     created_by: 'Lana',
-  }
+  },
 ];
