@@ -251,7 +251,7 @@ class Timeline {
       }));
     if (parsedData.length === 1) {
       parsedData.unshift({
-        date: new Date(d[0].date.getFullYear(), d[0].date.getMonth(), d[0].date.getDate() - 1),
+        date: new Date(parsedData[0].date.getFullYear(), parsedData[0].date.getMonth(), parsedData[0].date.getDate() - 1),
         score: this.config.yAxisValue[0],
         createdBy: 'Default initial score'
       });
