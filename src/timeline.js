@@ -24,7 +24,7 @@ class Timeline {
     const y = this.y;
     const y2 = this.y2;
 
-    this.clipId = `clip-${this.chartWrapper.id}`; 
+    this.clipId = `clip-${this.chartWrapper.id}`;
     this.svg.append('defs').append('clipPath')
       .attr('id', this.clipId)
       .append('rect')
@@ -322,11 +322,11 @@ class Timeline {
   }
 
   update(data) {
-    const updatedData = this.parseData(data);
+    this.data = this.parseData(data);
     const focus = this.svg.select('.focus');
     const context = this.svg.select('.context');
 
-    this.x.domain(d3.extent(updatedData, d => d.date));
+    this.x.domain(d3.extent(this.data, d => d.date));
     this.y.domain(this.config.yAxisValue);
     this.x2.domain(this.x.domain());
     this.y2.domain(this.y.domain());
@@ -343,23 +343,23 @@ class Timeline {
       .call(this.brush.move, null);
 
     focus.select('.line')
-      .datum(updatedData)
+      .datum(this.data)
       .attr('d', this.chartLine);
 
     focus.select('.area')
-      .datum(updatedData)
+      .datum(this.data)
       .attr('d', this.chartArea);
 
     context.select('.line')
-      .datum(updatedData)
+      .datum(this.data)
       .attr('d', this.timelineLine);
 
     context.select('.area')
-      .datum(updatedData)
+      .datum(this.data)
       .attr('d', this.timelineArea);
 
     const dots = focus.select('.dots').selectAll('.dot')
-      .data(updatedData);
+      .data(this.data);
 
     dots.enter()
       .append('circle')
