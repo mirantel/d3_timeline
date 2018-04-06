@@ -180,8 +180,8 @@ class Timeline {
     // Define the zoom
     this.zoom = d3.zoom()
       .scaleExtent([1, data.length * 12])
-      .translateExtent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
-      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.hartHeight]])
+      .translateExtent([[this.dotPlaceholder, 0], [this.graphWidth, this.chartHeight]])
+      .extent([[this.dotPlaceholder, 0], [this.graphWidth, this.chartHeight]])
       .on('zoom', this.zoomed.bind(this));
 
     this.chartArea = d3.area()
