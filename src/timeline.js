@@ -17,9 +17,13 @@ class Timeline {
     this.marginBottom = 30;
     this.spaceAfterMainChart = 35;
 
-    this.render();
-
     this.clipId = `clip-${this.chartWrapper.id}`;
+
+    this.render();
+    this.createSvg();
+  }
+
+  createSvg() {
     this.svg.append('defs').append('clipPath')
       .attr('id', this.clipId)
       .append('rect')
@@ -203,9 +207,6 @@ class Timeline {
     this.timelineLine = d3.line()
       .x(d => this.x2(d.date))
       .y(d => this.y2(d.score));
-
-    this.svg.select('.clipRect')
-      .attr('width', this.width);
   }
 
   resize() {
@@ -214,12 +215,13 @@ class Timeline {
 
     this.render();
 
+    this.svg.select('.clipRect').attr('width', this.width);
     focus.select('.axis--x').call(this.xAxis);
     focus.select('.axis--y').call(this.yAxis);
     focus.select('.area').attr('d', this.chartArea);
     focus.select('.line').attr('d', this.chartLine);
     focus.selectAll('.dot').attr('cx', d => this.x(d.date));
-    focus.select('.zoom').attr('width', this.width);
+    focus.select('.zoom').attr('width', this.width).call(this.zoom);
 
     context.select('.axis--x').call(this.xAxis2);
     context.select('.area').attr('d', this.timelineArea);
