@@ -19,11 +19,6 @@ class Timeline {
 
     this.render();
 
-    const x = this.x;
-    const x2 = this.x2;
-    const y = this.y;
-    const y2 = this.y2;
-
     this.clipId = `clip-${this.chartWrapper.id}`;
     this.svg.append('defs').append('clipPath')
       .attr('id', this.clipId)
@@ -44,12 +39,6 @@ class Timeline {
     const tooltip = d3.select(this.chartWrapper).append('div')
       .attr('class', 'd3-tooltip')
       .style('opacity', 0);
-
-    // Scale the range of the data
-    x.domain(d3.extent(this.data, d => d.date));
-    y.domain(config.yAxisValue);
-    x2.domain(x.domain());
-    y2.domain(y.domain());
 
     focus.append('path')
       .datum(this.data)
@@ -92,8 +81,8 @@ class Timeline {
       .append('circle')
       .attr('r', this.dotSize)
       .attr('class', 'dot')
-      .attr('cx', d => x(d.date))
-      .attr('cy', d => y(d.score))
+      .attr('cx', d => this.x(d.date))
+      .attr('cy', d => this.y(d.score))
       .on('mouseover', this.showTooltip.bind(this))
       .on('mouseout', this.hideTooltip.bind(this));
 
@@ -118,7 +107,7 @@ class Timeline {
     context.append('g')
       .attr('class', 'brush')
       .call(this.brush)
-      .call(this.brush.move, x.range());
+      .call(this.brush.move, this.x.range());
   }
 
   render() {
@@ -159,22 +148,26 @@ class Timeline {
     this.timelineHeight = this.timelinePlaceholder - this.timelineMargin.bottom;
 
     // Set the ranges
-    this.x = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
-    this.x2 = d3.scaleTime().range([this.dotPlaceholder, this.graphWidth]);
-    this.y = d3.scaleLinear().range([this.chartHeight, 0]);
-    this.y2 = d3.scaleLinear().range([this.timelineHeight, 0]);
-    const x = this.x;
-    const x2 = this.x2;
-    const y = this.y;
-    const y2 = this.y2;
+    this.x = d3.scaleTime()
+      .range([this.dotPlaceholder, this.graphWidth])
+      .domain(d3.extent(data, d => d.date));
+    this.x2 = d3.scaleTime()
+      .range([this.dotPlaceholder, this.graphWidth])
+      .domain(this.x.domain());
+    this.y = d3.scaleLinear()
+      .range([this.chartHeight, 0])
+      .domain(this.config.yAxisValue);
+    this.y2 = d3.scaleLinear()
+      .range([this.timelineHeight, 0])
+      .domain(this.y.domain());
 
     // Define the axes
-    this.xAxis = d3.axisBottom(x)
+    this.xAxis = d3.axisBottom(this.x)
       .tickSize(-this.chartHeight)
       .tickSizeOuter(0)
       .tickPadding(10);
-    this.xAxis2 = d3.axisBottom(x2);
-    this.yAxis = d3.axisLeft(y)
+    this.xAxis2 = d3.axisBottom(this.x2);
+    this.yAxis = d3.axisLeft(this.y)
       .tickSize(-this.width)
       .ticks(this.config.yAxisTicksNum)
       .tickFormat(d => d + this.config.yAxisTickFormat);
