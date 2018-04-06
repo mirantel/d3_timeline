@@ -186,32 +186,26 @@ class Timeline {
 
     this.chartArea = d3.area()
       .curve(d3.curveLinear)
-      .x(d => x(d.date))
+      .x(d => this.x(d.date))
       .y0(this.chartHeight)
-      .y1(d => y(d.score));
+      .y1(d => this.y(d.score));
 
     this.timelineArea = d3.area()
       .curve(d3.curveLinear)
-      .x(d => x2(d.date))
+      .x(d => this.x2(d.date))
       .y0(this.timelineHeight)
-      .y1(d => y2(d.score));
+      .y1(d => this.y2(d.score));
 
     this.chartLine = d3.line()
-      .x(d => x(d.date))
-      .y(d => y(d.score));
+      .x(d => this.x(d.date))
+      .y(d => this.y(d.score));
 
     this.timelineLine = d3.line()
-      .x(d => x2(d.date))
-      .y(d => y2(d.score));
+      .x(d => this.x2(d.date))
+      .y(d => this.y2(d.score));
 
     this.svg.select('.clipRect')
       .attr('width', this.width);
-
-    // Scale the range of the data
-    x.domain(d3.extent(data, d => d.date));
-    y.domain(this.config.yAxisValue);
-    x2.domain(x.domain());
-    y2.domain(y.domain());
   }
 
   resize() {
