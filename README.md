@@ -1,4 +1,4 @@
-# Learn D3.js
+# D3 Timeline
 
 For installation run:
 ```
